@@ -1,47 +1,54 @@
-// KLUCZ DLA LOCALSTORAGE
+// =============== KONFIG SUPABASE ===============
+// PODMIEŃ na swoje dane z panelu (Project settings -> API)
+const SUPABASE_URL = "https://hfdhqvesvxbrzgpgzawa.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmZGhxdmVzdnhicnpncGd6YXdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyMDE4MzQsImV4cCI6MjA4MDc3NzgzNH0.K7Dt7gQbXO8zvA60HVlDHV4nNRF3Q6jKfJsqjzuW3uE";
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// =============== LOCALSTORAGE ===============
 const STORAGE_KEY = "puzzleProgress";
 
-// Globalne zmienne konfiguracyjne
-let appConfig = null;      // zawartość config.json
-let currentPuzzle = null;  // dzisiejsze zadanie
-let gameDay = null;        // data dnia gry, np. "2025-01-12"
-let progress = null;       // postęp gracza z localStorage
+let appConfig = null;      // config.json
+let currentPuzzle = null;  // zadanie na dany dzień
+let gameDay = null;        // data dnia gry YYYY-MM-DD
+let progress = null;       // { letters: string, solvedDays: string[] }
 
 // -------------- ENTRY POINT --------------
 window.addEventListener("DOMContentLoaded", async () => {
     progress = loadProgress();
 
-    // Wczytanie config.json
-    appConfig = await loadConfig();
+    try {
+        appConfig = await loadConfig();
+    } catch (e) {
+        console.error("Błąd wczytywania config.json:", e);
+        alert("Nie udało się wczytać konfiguracji gry (config.json).");
+        return;
+    }
 
-    // Wyznaczenie "dnia gry"
     gameDay = getGameDayDate();
-    document.getElementById("dateLabel").innerText = gameDay;
-
     console.log("gameDay:", gameDay);
     console.log("config puzzles:", appConfig.puzzles);
 
-    // Szukamy zadania dla danego dnia
+    document.getElementById("dateLabel").innerText = gameDay;
+
     currentPuzzle = appConfig.puzzles.find(p => p.date === gameDay);
 
     if (!currentPuzzle) {
-        // Brak zadania na ten dzień
+        // brak zadania na ten dzień
         document.getElementById("taskText0").innerText = "Brak zadania na ten dzień.";
         document.getElementById("taskText1").innerText = "";
         document.getElementById("taskText2").innerText = "";
         disableInputs();
     } else {
-        // Ustaw tekst zadań
+        // ustaw tekst zadań
         currentPuzzle.tasks.forEach((t, idx) => {
             const el = document.getElementById(`taskText${idx}`);
             if (el) el.innerText = t;
         });
     }
 
-    // Ustaw etykietę z hasłem / literami
     updateLettersLabel();
 
-    // Listeners
     document.getElementById("checkButton")
         .addEventListener("click", onCheckClick);
 
@@ -51,39 +58,34 @@ window.addEventListener("DOMContentLoaded", async () => {
         });
 });
 
-// -------------- FUNKCJE POMOCNICZE --------------
-
-// Wczytanie config.json (zawiera finalSolution i puzzle)
+// -------------- PLIK KONFIGURACYJNY --------------
 async function loadConfig() {
     const res = await fetch("config.json");
     if (!res.ok) {
-        throw new Error("Nie udało się wczytać config.json");
+        throw new Error(`HTTP ${res.status}`);
     }
     return await res.json();
 }
 
-// Określenie "dnia gry" (24h od 15:00 do 14:59 następnego dnia)
+// -------------- DZIEŃ GRY (15:00 – 14:59) --------------
 function getGameDayDate() {
     const now = new Date();
     const year = now.getFullYear();
-    const month = now.getMonth();      // 0–11
-    const day = now.getDate();         // 1–31
+    const month = now.getMonth();
+    const day = now.getDate();
 
-    // Startujemy od "dzisiaj"
-    let gameDay = new Date(year, month, day);
-
-    // Jeśli jest przed 15:00, to dzień gry to "wczoraj"
+    let d = new Date(year, month, day);
     if (now.getHours() < 15) {
-        gameDay.setDate(gameDay.getDate() - 1);
+        d.setDate(d.getDate() - 1);
     }
 
-    const yyyy = gameDay.getFullYear();
-    const mm = String(gameDay.getMonth() + 1).padStart(2, "0");
-    const dd = String(gameDay.getDate()).padStart(2, "0");
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
 }
 
-// Wczytanie postępu z localStorage
+// -------------- LOCALSTORAGE PROGRESS --------------
 function loadProgress() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
@@ -96,12 +98,11 @@ function loadProgress() {
     }
 }
 
-// Zapis postępu do localStorage
 function saveProgress() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
 }
 
-// Aktualizacja napisu na dole (pattern hasła)
+// -------------- WYSWIETLANIE HASŁA / LITER --------------
 function updateLettersLabel() {
     const label = document.getElementById("lettersLabel");
 
@@ -119,15 +120,13 @@ function updateLettersLabel() {
         } else {
             pattern += "_";
         }
-
-        // Opcjonalne spacje, żeby było czytelniej
         pattern += " ";
     }
 
     label.innerText = pattern.trim();
 }
 
-// Zablokowanie inputów, gdy nie ma zadania
+// -------------- BLOKADA INPUTÓW, GDY BRAK ZADANIA --------------
 function disableInputs() {
     for (let i = 0; i < 3; i++) {
         const input = document.getElementById(`answer${i}`);
@@ -136,12 +135,31 @@ function disableInputs() {
     document.getElementById("checkButton").disabled = true;
 }
 
-// -------------- LOGIKA SPRAWDZANIA --------------
+// -------------- WYSYŁANIE DO SUPABASE --------------
+async function sendToBackend(gameDay, answers, allCorrect) {
+    try {
+        const { error } = await supabaseClient
+            .from("submissions")
+            .insert([{
+                game_day: gameDay,
+                answers: answers,
+                all_correct: allCorrect
+            }]);
 
+        if (error) {
+            console.error("Błąd zapisu w Supabase:", error);
+        } else {
+            console.log("Zapisano submission w Supabase.");
+        }
+    } catch (e) {
+        console.error("Wyjątek przy zapisie do Supabase:", e);
+    }
+}
+
+// -------------- LOGIKA SPRAWDZANIA --------------
 async function onCheckClick() {
     if (!currentPuzzle) return;
 
-    // Pobranie odpowiedzi użytkownika
     const userAnswers = [
         document.getElementById("answer0").value.trim(),
         document.getElementById("answer1").value.trim(),
@@ -149,27 +167,25 @@ async function onCheckClick() {
     ].map(a => a.toUpperCase());
 
     const correctAnswers = currentPuzzle.answers.map(a => a.toUpperCase());
-
     const allCorrect = userAnswers.every((ans, i) => ans === correctAnswers[i]);
+
+    // Wyślij do Supabase (nawet jeśli błędne – będziesz miał statystyki)
+    sendToBackend(gameDay, userAnswers, allCorrect);
 
     if (!allCorrect) {
         alert("Nie wszystkie odpowiedzi są poprawne. Spróbuj ponownie.");
         return;
     }
 
-    // Sprawdzamy, czy już dzisiaj rozwiązano zadanie
+    // przyznawanie litery tylko raz na dzień
     if (!progress.solvedDays.includes(gameDay)) {
         progress.solvedDays.push(gameDay);
         progress.letters += currentPuzzle.rewardLetter;
         saveProgress();
     }
 
-    // Odśwież napis z hasłem / literami
     updateLettersLabel();
 
-    // Pokaż popup z literą
     document.getElementById("rewardLetterLabel").innerText = currentPuzzle.rewardLetter;
     document.getElementById("successPopup").classList.remove("hidden");
-
-    
 }
