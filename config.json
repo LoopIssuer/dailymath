@@ -1,0 +1,33 @@
+{
+  "finalSolution": "ROWNOWAGA",
+  "puzzles": [
+    {
+      "date": "2025-01-12",
+      "tasks": [
+        "Zadanie z dnia 12.01 #1",
+        "Zadanie z dnia 12.01 #2",
+        "Zadanie z dnia 12.01 #3"
+      ],
+      "answers": [
+        "KOT",
+        "DRZEWO",
+        "RZEKA"
+      ],
+      "rewardLetter": "R"
+    },
+    {
+      "date": "2025-01-13",
+      "tasks": [
+        "Zadanie z dnia 13.01 #1",
+        "Zadanie z dnia 13.01 #2",
+        "Zadanie z dnia 13.01 #3"
+      ],
+      "answers": [
+        "DOM",
+        "SAMOCHOD",
+        "KRZESLO"
+      ],
+      "rewardLetter": "O"
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 40px;
+    background-color: #f7f7f7;
+}
+
+/* GÓRNA RAMKA Z DATĄ */
+.date-box {
+    border: 2px solid #000;
+    padding: 16px 24px;
+    margin: 0 auto 40px auto;
+    max-width: 600px;
+    text-align: center;
+    background-color: #fff;
+}
+
+/* GŁÓWNY UKŁAD ZADAŃ */
+.tasks-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 60px;
+    margin-bottom: 40px;
+}
+
+.tasks-left,
+.tasks-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* RAMKI Z TEKSTEM ZADANIA (PODOBNE DO TWOICH NA RYSUNKU) */
+.task-row {
+    width: 300px;
+}
+
+.task-text {
+    border: 2px solid red;
+    padding: 10px 14px;
+    background-color: #fff;
+}
+
+/* INPUTY Z ROZWIĄZANIAMI */
+.answer-input {
+    width: 220px;
+    padding: 10px 14px;
+    border: 2px solid #000;
+    background-color: #fff;
+}
+
+/* PRZYCISK W CENTRUM */
+.button-container {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.button-container button {
+    padding: 12px 20px;
+    border: 2px solid #000;
+    background-color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.button-container button:hover {
+    transform: translateY(-1px);
+}
+
+/* DOLNA RAMKA Z HASŁEM / LITERAMI */
+.letters-box {
+    border: 2px solid #000;
+    padding: 16px 24px;
+    margin: 0 auto;
+    max-width: 800px;
+    background-color: #fff;
+}
+
+/* POPUP – TŁO */
+.popup {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* UKRYCIE POPUPU */
+.hidden {
+    display: none;
+}
+
+/* POPUP – ZAWARTOŚĆ */
+.popup-content {
+    background-color: #fff;
+    padding: 24px 32px;
+    border: 2px solid #000;
+    text-align: center;
+    min-width: 280px;
+}
+
+.popup-content h2 {
+    font-size: 32px;
+    margin: 16px 0;
+}
+
+.popup-content button {
+    padding: 8px 16px;
+    border: 2px solid #000;
+    background-color: #fff;
+    cursor: pointer;
+}

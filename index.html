@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <title>Codzienne zadanie</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <!-- GÓRNA BELKA Z DATĄ DNIA GRY -->
+    <div class="date-box">
+        DATA DNIA GRY: <span id="dateLabel"></span>
+    </div>
+
+    <!-- GŁÓWNY UKŁAD: ZADANIA PO LEWEJ, INPUTY PO PRAWEJ -->
+    <div class="tasks-container">
+        <div class="tasks-left">
+            <div class="task-row">
+                <div class="task-text" id="taskText0">Tutaj pojawi się zadanie 1</div>
+            </div>
+            <div class="task-row">
+                <div class="task-text" id="taskText1">Tutaj pojawi się zadanie 2</div>
+            </div>
+            <div class="task-row">
+                <div class="task-text" id="taskText2">Tutaj pojawi się zadanie 3</div>
+            </div>
+        </div>
+
+        <div class="tasks-right">
+            <input class="answer-input" id="answer0" placeholder="Rozwiązanie 1" />
+            <input class="answer-input" id="answer1" placeholder="Rozwiązanie 2" />
+            <input class="answer-input" id="answer2" placeholder="Rozwiązanie 3" />
+        </div>
+    </div>
+
+    <!-- PRZYCISK SPRAWDZANIA -->
+    <div class="button-container">
+        <button id="checkButton">SPRAWDŹ WPISANE ROZWIĄZANIA</button>
+    </div>
+
+    <!-- AKTUALNIE ZDOBYTE LITERY / HASŁO -->
+    <div class="letters-box">
+        AKTUALNIE ZDOBYTE LITERY / HASŁO: <span id="lettersLabel"></span>
+    </div>
+
+    <!-- POPUP SUKCESU -->
+    <div id="successPopup" class="popup hidden">
+        <div class="popup-content">
+            <p>Brawo! Dzisiejsze zadanie rozwiązane poprawnie.</p>
+            <p>Zdobywasz literę:</p>
+            <h2 id="rewardLetterLabel"></h2>
+            <button id="closePopupButton">OK</button>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
