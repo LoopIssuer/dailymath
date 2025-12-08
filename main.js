@@ -18,6 +18,9 @@ window.addEventListener("DOMContentLoaded", async () => {
     gameDay = getGameDayDate();
     document.getElementById("dateLabel").innerText = gameDay;
 
+    console.log("gameDay:", gameDay);
+    console.log("config puzzles:", appConfig.puzzles);
+
     // Szukamy zadania dla danego dnia
     currentPuzzle = appConfig.puzzles.find(p => p.date === gameDay);
 
@@ -167,4 +170,6 @@ async function onCheckClick() {
     // Pokaż popup z literą
     document.getElementById("rewardLetterLabel").innerText = currentPuzzle.rewardLetter;
     document.getElementById("successPopup").classList.remove("hidden");
+
+    
 }
