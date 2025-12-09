@@ -3,50 +3,35 @@
 const SUPABASE_URL = "https://hfdhqvesvxbrzgpgzawa.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmZGhxdmVzdnhicnpncGd6YXdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyMDE4MzQsImV4cCI6MjA4MDc3NzgzNH0.K7Dt7gQbXO8zvA60HVlDHV4nNRF3Q6jKfJsqjzuW3uE";
 
+
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// =============== LOCALSTORAGE ===============
-const STORAGE_KEY = "puzzleProgress";
-
-let appConfig = null;      // config.json
+// ===================== GLOBALNE ZMIENNE =====================
+let appConfig = null;      // dane z config.json
 let currentPuzzle = null;  // zadanie na dany dzień
 let gameDay = null;        // data dnia gry YYYY-MM-DD
-let progress = null;       // { letters: string, solvedDays: string[] }
+let playerRow = null;      // rekord gracza z tabeli players (może być null)
+let playerName = null;     // imię użytkownika
 
-// -------------- ENTRY POINT --------------
+// ===================== ENTRY POINT =====================
 window.addEventListener("DOMContentLoaded", async () => {
-    progress = loadProgress();
-
     try {
         appConfig = await loadConfig();
     } catch (e) {
         console.error("Błąd wczytywania config.json:", e);
-        alert("Nie udało się wczytać konfiguracji gry (config.json).");
+        alert("Nie udało się wczytać konfiguracji gry.");
         return;
     }
 
-    gameDay = getGameDayDate();
-    console.log("gameDay:", gameDay);
-    console.log("config puzzles:", appConfig.puzzles);
+    await ensurePlayerName();
 
+    gameDay = getGameDayDate();
     document.getElementById("dateLabel").innerText = gameDay;
 
-    currentPuzzle = appConfig.puzzles.find(p => p.date === gameDay);
+    // wczytaj progres gracza (jeśli istnieje w bazie)
+    playerRow = await loadPlayerByName(playerName);
 
-    if (!currentPuzzle) {
-        // brak zadania na ten dzień
-        document.getElementById("taskText0").innerText = "Brak zadania na ten dzień.";
-        document.getElementById("taskText1").innerText = "";
-        document.getElementById("taskText2").innerText = "";
-        disableInputs();
-    } else {
-        // ustaw tekst zadań
-        currentPuzzle.tasks.forEach((t, idx) => {
-            const el = document.getElementById(`taskText${idx}`);
-            if (el) el.innerText = t;
-        });
-    }
-
+    renderPuzzleUI();
     updateLettersLabel();
 
     document.getElementById("checkButton")
@@ -58,7 +43,7 @@ window.addEventListener("DOMContentLoaded", async () => {
         });
 });
 
-// -------------- PLIK KONFIGURACYJNY --------------
+// ===================== Wczytywanie config.json =====================
 async function loadConfig() {
     const res = await fetch("config.json");
     if (!res.ok) {
@@ -67,55 +52,111 @@ async function loadConfig() {
     return await res.json();
 }
 
-// -------------- DZIEŃ GRY (15:00 – 14:59) --------------
+// ===================== Dzień gry (15:00 – 14:59) =====================
 function getGameDayDate() {
     const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-    const day = now.getDate();
+    const y = now.getFullYear();
+    const m = now.getMonth();
+    const d = now.getDate();
 
-    let d = new Date(year, month, day);
+    let date = new Date(y, m, d);
     if (now.getHours() < 15) {
-        d.setDate(d.getDate() - 1);
+        date.setDate(date.getDate() - 1);
     }
 
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(d.getDate()).padStart(2, "0");
-    return `${yyyy}-${mm}-${dd}`;
+    // YYYY-MM-DD
+    return date.toISOString().slice(0, 10);
 }
 
-// -------------- LOCALSTORAGE PROGRESS --------------
-function loadProgress() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) {
-        return { letters: "", solvedDays: [] };
-    }
+// ===================== Imię użytkownika (localStorage + overlay) =====================
+function ensurePlayerName() {
+    return new Promise(resolve => {
+        const storedName = localStorage.getItem("player_name");
+        const nameLabel = document.getElementById("nameLabel");
+        const overlay = document.getElementById("nameOverlay");
+        const input = document.getElementById("nameInput");
+        const btn = document.getElementById("saveNameButton");
+
+        if (storedName) {
+            playerName = storedName;
+            nameLabel.innerText = playerName;
+            overlay.classList.add("hidden");
+            resolve();
+            return;
+        }
+
+        // Brak imienia -> pokaż overlay
+        overlay.classList.remove("hidden");
+
+        btn.addEventListener("click", () => {
+            const val = (input.value || "").trim();
+            if (!val) {
+                alert("Podaj imię.");
+                return;
+            }
+
+            playerName = val;
+            localStorage.setItem("player_name", playerName);
+            nameLabel.innerText = playerName;
+            overlay.classList.add("hidden");
+            resolve();
+        }, { once: true });
+    });
+}
+
+// ===================== Wczytanie progresu gracza z Supabase =====================
+async function loadPlayerByName(name) {
     try {
-        return JSON.parse(raw);
-    } catch {
-        return { letters: "", solvedDays: [] };
+        const { data, error } = await supabaseClient
+            .from("players")
+            .select("*")
+            .eq("name", name)
+            .limit(1);
+
+        if (error) {
+            console.error("Błąd SELECT players:", error);
+            return null;
+        }
+
+        if (!data || data.length === 0) {
+            return null;
+        }
+
+        return data[0];
+    } catch (e) {
+        console.error("Wyjątek przy loadPlayerByName:", e);
+        return null;
     }
 }
 
-function saveProgress() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-}
+// ===================== Render zadań =====================
+function renderPuzzleUI() {
+    currentPuzzle = appConfig.puzzles.find(p => p.date === gameDay);
 
-// -------------- WYSWIETLANIE HASŁA / LITER --------------
-function updateLettersLabel() {
-    const label = document.getElementById("lettersLabel");
-
-    if (!appConfig || !appConfig.finalSolution) {
-        label.innerText = progress.letters || "_";
+    if (!currentPuzzle) {
+        document.getElementById("taskText0").innerText = "Brak zadania na ten dzień.";
+        document.getElementById("taskText1").innerText = "";
+        document.getElementById("taskText2").innerText = "";
+        disableInputs();
         return;
     }
 
+    currentPuzzle.tasks.forEach((t, idx) => {
+        const el = document.getElementById(`taskText${idx}`);
+        if (el) el.innerText = t;
+    });
+}
+
+// ===================== Wyświetlanie liter / hasła =====================
+function updateLettersLabel() {
+    const label = document.getElementById("lettersLabel");
     const final = appConfig.finalSolution;
+
+    const lettersCount = playerRow ? (playerRow.letters || "").length : 0;
     let pattern = "";
 
     for (let i = 0; i < final.length; i++) {
-        if (i < progress.letters.length) {
+        if (i < lettersCount) {
             pattern += final[i];
         } else {
             pattern += "_";
@@ -126,66 +167,92 @@ function updateLettersLabel() {
     label.innerText = pattern.trim();
 }
 
-// -------------- BLOKADA INPUTÓW, GDY BRAK ZADANIA --------------
+// ===================== Blokada inputów przy braku zadania =====================
 function disableInputs() {
     for (let i = 0; i < 3; i++) {
         const input = document.getElementById(`answer${i}`);
         if (input) input.disabled = true;
     }
-    document.getElementById("checkButton").disabled = true;
+    const btn = document.getElementById("checkButton");
+    if (btn) btn.disabled = true;
 }
 
-// -------------- WYSYŁANIE DO SUPABASE --------------
-async function sendToBackend(gameDay, answers, allCorrect) {
-    try {
-        const { error } = await supabaseClient
-            .from("submissions")
+// ===================== Aktualizacja progresu w bazie (tylko przy poprawnej) =====================
+async function updatePlayerAfterSolve() {
+    // jeśli nie ma jeszcze rekordu w players -> tworzymy pierwszy
+    if (!playerRow) {
+        const { data, error } = await supabaseClient
+            .from("players")
             .insert([{
-                game_day: gameDay,
-                answers: answers,
-                all_correct: allCorrect
-            }]);
+                name: playerName,
+                letters: currentPuzzle.rewardLetter,
+                solved_days: [gameDay]
+            }])
+            .select()
+            .single();
 
         if (error) {
-            console.error("Błąd zapisu w Supabase:", error);
-        } else {
-            console.log("Zapisano submission w Supabase.");
+            console.error("Błąd INSERT players:", error);
+            return;
         }
-    } catch (e) {
-        console.error("Wyjątek przy zapisie do Supabase:", e);
+
+        playerRow = data;
+        return;
     }
+
+    // jeśli rekord istnieje
+    const alreadySolved = (playerRow.solved_days || []).includes(gameDay);
+    if (alreadySolved) {
+        // tego dnia już był progres, nie dodajemy kolejnej litery
+        return;
+    }
+
+    const newLetters = (playerRow.letters || "") + currentPuzzle.rewardLetter;
+    const newSolved = [...(playerRow.solved_days || []), gameDay];
+
+    const { data, error } = await supabaseClient
+        .from("players")
+        .update({
+            letters: newLetters,
+            solved_days: newSolved
+        })
+        .eq("id", playerRow.id)
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Błąd UPDATE players:", error);
+        return;
+    }
+
+    playerRow = data;
 }
 
-// -------------- LOGIKA SPRAWDZANIA --------------
+// ===================== Sprawdzanie odpowiedzi =====================
 async function onCheckClick() {
     if (!currentPuzzle) return;
 
     const userAnswers = [
-        document.getElementById("answer0").value.trim(),
-        document.getElementById("answer1").value.trim(),
-        document.getElementById("answer2").value.trim()
-    ].map(a => a.toUpperCase());
+        document.getElementById("answer0").value.trim().toUpperCase(),
+        document.getElementById("answer1").value.trim().toUpperCase(),
+        document.getElementById("answer2").value.trim().toUpperCase()
+    ];
 
     const correctAnswers = currentPuzzle.answers.map(a => a.toUpperCase());
     const allCorrect = userAnswers.every((ans, i) => ans === correctAnswers[i]);
 
-    // Wyślij do Supabase (nawet jeśli błędne – będziesz miał statystyki)
-    sendToBackend(gameDay, userAnswers, allCorrect);
-
     if (!allCorrect) {
         alert("Nie wszystkie odpowiedzi są poprawne. Spróbuj ponownie.");
+        // NIE zapisujemy nic w bazie
         return;
     }
 
-    // przyznawanie litery tylko raz na dzień
-    if (!progress.solvedDays.includes(gameDay)) {
-        progress.solvedDays.push(gameDay);
-        progress.letters += currentPuzzle.rewardLetter;
-        saveProgress();
-    }
-
+    // Zapis tylko dla poprawnych odpowiedzi:
+    await updatePlayerAfterSolve();
     updateLettersLabel();
 
+    // Pokazujemy popup z literą (zawsze tę samą dla danego dnia)
     document.getElementById("rewardLetterLabel").innerText = currentPuzzle.rewardLetter;
     document.getElementById("successPopup").classList.remove("hidden");
 }
+

@@ -5,14 +5,25 @@
     <title>Codzienne zadanie</title>
     <link rel="stylesheet" href="style.css" />
 
-    <!-- Supabase JS (v2) z CDN -->
+    <!-- Supabase JS v2 -->
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
-    <!-- GÓRNA BELKA Z DATĄ DNIA GRY -->
+    <!-- OVERLAY DO PODANIA IMIENIA -->
+    <div id="nameOverlay" class="popup hidden">
+        <div class="popup-content">
+            <p>Podaj swoje imię, aby zapisać progres:</p>
+            <input id="nameInput" placeholder="Twoje imię" />
+            <div style="margin-top: 12px;">
+                <button id="saveNameButton">Zapisz imię</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GÓRNA RAMKA Z DATĄ I IMIENIEM -->
     <div class="date-box">
-        DATA DNIA GRY: <span id="dateLabel"></span>
+        DATA DNIA GRY: <span id="dateLabel"></span><br />
+        UŻYTKOWNIK: <span id="nameLabel"></span>
     </div>
 
     <!-- GŁÓWNY UKŁAD: ZADANIA PO LEWEJ, INPUTY PO PRAWEJ -->
@@ -41,7 +52,7 @@
         <button id="checkButton">SPRAWDŹ WPISANE ROZWIĄZANIA</button>
     </div>
 
-    <!-- AKTUALNIE ZDOBYTE LITERY / HASŁO -->
+    <!-- DOLNA RAMKA Z HASŁEM / LITERAMI -->
     <div class="letters-box">
         AKTUALNIE ZDOBYTE LITERY / HASŁO: <span id="lettersLabel"></span>
     </div>
