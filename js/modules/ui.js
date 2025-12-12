@@ -67,11 +67,11 @@ export function showIntroPanel(currentPuzzle, gameDay, getImagePath) {
     }
 
     if (textEl) {
-      textEl.innerText = "Skontaktuj się z agentem TW ;)";
+      textEl.innerText = "Witaj, rozpoczynasz pracę dla Shield! Za chwilę podasz swoje imię.";
     }
 
     if (closeBtn) {
-      closeBtn.innerText = "Rozumiem";
+      closeBtn.innerText = "Jestem Gotowy!";
     }
 
     if (playBtn) {
