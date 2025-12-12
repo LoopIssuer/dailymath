@@ -4,11 +4,18 @@
     <meta charset="UTF-8" />
     <title>Codzienne zadanie</title>
     <link rel="stylesheet" href="style.css" />
-
-    <!-- Supabase JS v2 -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 <body>
+    <!-- CZARNY PANEL POWITALNY -->
+    <div id="welcomeOverlay" class="welcome-overlay">
+        <div class="welcome-content">
+            <h1 id="welcomeTitle">ŁADOWANIE...</h1>
+            <button id="welcomeButton" class="welcome-button">CZEKAJ...</button>
+        </div>
+    </div>
+
     <!-- OVERLAY DO PODANIA IMIENIA -->
     <div id="nameOverlay" class="popup hidden">
         <div class="popup-content">
@@ -20,30 +27,54 @@
         </div>
     </div>
 
+    <!-- INTRO PANEL -->
+    <div id="introOverlay" class="popup hidden">
+        <div class="popup-content">
+            <img id="introImage" src="" alt="Powitanie" style="max-width: 100%; height: auto; margin-bottom: 16px;" />
+            <p id="introText">Tekst intro z config.json</p>
+            <audio id="introAudio"></audio>
+            
+            <!-- PRZYCISKI INTRO -->
+            <div class="intro-buttons">
+                <button id="playAudioButton" class="secondary-button hidden">
+                    🔊 Odsłuchaj Wiadomość
+                </button>
+                <button id="introCloseButton">Zaczynamy!</button>
+            </div>
+        </div>
+    </div>
+
     <!-- GÓRNA RAMKA Z DATĄ I IMIENIEM -->
     <div class="date-box">
         DATA DNIA GRY: <span id="dateLabel"></span><br />
         UŻYTKOWNIK: <span id="nameLabel"></span>
     </div>
 
-    <!-- GŁÓWNY UKŁAD: ZADANIA PO LEWEJ, INPUTY PO PRAWEJ -->
+    <!-- GŁÓWNY UKŁAD: ZADANIA PIONOWO -->
     <div class="tasks-container">
-        <div class="tasks-left">
-            <div class="task-row">
-                <div class="task-text" id="taskText0">Tutaj pojawi się zadanie 1</div>
-            </div>
-            <div class="task-row">
-                <div class="task-text" id="taskText1">Tutaj pojawi się zadanie 2</div>
-            </div>
-            <div class="task-row">
-                <div class="task-text" id="taskText2">Tutaj pojawi się zadanie 3</div>
-            </div>
+        <!-- ZADANIE 1 -->
+        <div class="task-block">
+            <div class="task-text" id="taskText0">Tutaj pojawi się zadanie 1</div>
+            <img id="taskImage0" class="task-image hidden" alt="Ilustracja zadania 1" />
+            <input class="answer-input" id="answer0" placeholder="Wpisz rozwiązanie..." />
         </div>
 
-        <div class="tasks-right">
-            <input class="answer-input" id="answer0" placeholder="Rozwiązanie 1" />
-            <input class="answer-input" id="answer1" placeholder="Rozwiązanie 2" />
-            <input class="answer-input" id="answer2" placeholder="Rozwiązanie 3" />
+        <div class="task-separator"></div>
+
+        <!-- ZADANIE 2 -->
+        <div class="task-block">
+            <div class="task-text" id="taskText1">Tutaj pojawi się zadanie 2</div>
+            <img id="taskImage1" class="task-image hidden" alt="Ilustracja zadania 2" />
+            <input class="answer-input" id="answer1" placeholder="Wpisz rozwiązanie..." />
+        </div>
+
+        <div class="task-separator"></div>
+
+        <!-- ZADANIE 3 -->
+        <div class="task-block">
+            <div class="task-text" id="taskText2">Tutaj pojawi się zadanie 3</div>
+            <img id="taskImage2" class="task-image hidden" alt="Ilustracja zadania 3" />
+            <input class="answer-input" id="answer2" placeholder="Wpisz rozwiązanie..." />
         </div>
     </div>
 
@@ -57,13 +88,17 @@
         AKTUALNIE ZDOBYTE LITERY / HASŁO: <span id="lettersLabel"></span>
     </div>
 
-    <!-- POPUP SUKCESU -->
-    <div id="successPopup" class="popup hidden">
+    <!-- POPUP WYNIKU (sukces/błąd) -->
+    <div id="resultPopup" class="popup hidden">
         <div class="popup-content">
-            <p>Brawo! Dzisiejsze zadanie rozwiązane poprawnie.</p>
-            <p>Zdobywasz literę:</p>
-            <h2 id="rewardLetterLabel"></h2>
-            <button id="closePopupButton">OK</button>
+            <img id="resultImage" src="" alt="Wynik" style="max-width: 100%; height: auto; margin-bottom: 16px;" />
+            <p id="resultText"></p>
+            <!-- Sekcja z literą - widoczna tylko przy sukcesie -->
+            <div id="rewardSection" class="hidden">
+                <p>Zdobywasz literę:</p>
+                <h2 id="rewardLetterLabel"></h2>
+            </div>
+            <button id="closeResultButton">OK</button>
         </div>
     </div>
 

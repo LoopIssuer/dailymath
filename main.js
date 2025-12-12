@@ -1,258 +1,526 @@
 // =============== KONFIG SUPABASE ===============
-// PODMIEŃ na swoje dane z panelu (Project settings -> API)
 const SUPABASE_URL = "https://hfdhqvesvxbrzgpgzawa.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmZGhxdmVzdnhicnpncGd6YXdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyMDE4MzQsImV4cCI6MjA4MDc3NzgzNH0.K7Dt7gQbXO8zvA60HVlDHV4nNRF3Q6jKfJsqjzuW3uE";
-
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhmZGhxdmVzdnhicnpncGd6YXdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyMDE4MzQsImV4cCI6MjA4MDc3NzgzNH0.K7Dt7gQbXO8zvA60HVlDHV4nNRF3Q6jKfJsqjzuW3uE";
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // ===================== GLOBALNE ZMIENNE =====================
-let appConfig = null;      // dane z config.json
-let currentPuzzle = null;  // zadanie na dany dzień
-let gameDay = null;        // data dnia gry YYYY-MM-DD
-let playerRow = null;      // rekord gracza z tabeli players (może być null)
-let playerName = null;     // imię użytkownika
+let appConfig = null;
+let currentPuzzle = null;
+let gameDay = null;
+let playerRow = null;
+let playerName = null;
 
 // ===================== ENTRY POINT =====================
 window.addEventListener("DOMContentLoaded", async () => {
-    try {
-        appConfig = await loadConfig();
-    } catch (e) {
-        console.error("Błąd wczytywania config.json:", e);
-        alert("Nie udało się wczytać konfiguracji gry.");
-        return;
-    }
+  try {
+    appConfig = await loadConfig();
+  } catch (e) {
+    console.error("Błąd wczytywania config.json:", e);
+    alert("Nie udało się wczytać konfiguracji gry.");
+    return;
+  }
 
-    await ensurePlayerName();
+  // Ustaw teksty z configa dla panelu powitalnego
+  updateWelcomeTexts();
 
-    gameDay = getGameDayDate();
-    document.getElementById("dateLabel").innerText = gameDay;
+  // Przygotuj wszystkie listenery
+  setupWelcomeListener();
+  setupIntroListeners();
+  setupResultListeners();
 
-    // wczytaj progres gracza (jeśli istnieje w bazie)
-    playerRow = await loadPlayerByName(playerName);
+  // Pobierz/zapisz imię gracza
+  await ensurePlayerName();
 
-    renderPuzzleUI();
-    updateLettersLabel();
+  // Ustaw datę
+  gameDay = getGameDayDate();
+  document.getElementById("dateLabel").innerText = gameDay;
 
-    document.getElementById("checkButton")
-        .addEventListener("click", onCheckClick);
+  // Wczytaj progres gracza
+  playerRow = await loadPlayerByName(playerName);
 
-    document.getElementById("closePopupButton")
-        .addEventListener("click", () => {
-            document.getElementById("successPopup").classList.add("hidden");
-        });
+  // Wyrenderuj zadanie
+  renderPuzzleUI();
+  updateLettersLabel();
+
+  // Przycisk sprawdzania
+  document.getElementById("checkButton").addEventListener("click", onCheckClick);
+
+  // Pokaż CZARNY PANEL POWITALNY
+  showWelcomePanel();
 });
 
 // ===================== Wczytywanie config.json =====================
 async function loadConfig() {
-    const res = await fetch("config.json");
-    if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-    }
-    return await res.json();
+  const res = await fetch("config.json");
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return await res.json();
 }
 
-// ===================== Dzień gry (15:00 – 14:59) =====================
+// ===================== Dzień gry =====================
 function getGameDayDate() {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = now.getMonth();
-    const d = now.getDate();
-
-    let date = new Date(y, m, d);
-    if (now.getHours() < 15) {
-        date.setDate(date.getDate() - 1);
-    }
-
-    // YYYY-MM-DD
-    return date.toISOString().slice(0, 10);
+  const now = new Date();
+  return now.toISOString().slice(0, 10);
 }
 
-// ===================== Imię użytkownika (localStorage + overlay) =====================
-function ensurePlayerName() {
-    return new Promise(resolve => {
-        const storedName = localStorage.getItem("player_name");
-        const nameLabel = document.getElementById("nameLabel");
-        const overlay = document.getElementById("nameOverlay");
-        const input = document.getElementById("nameInput");
-        const btn = document.getElementById("saveNameButton");
+// ===================== Budowanie ścieżek obrazków =====================
+function getImagePath(date, filename) {
+  return `img/${date}/${filename}`;
+}
 
-        if (storedName) {
-            playerName = storedName;
-            nameLabel.innerText = playerName;
-            overlay.classList.add("hidden");
-            resolve();
-            return;
+// ===================== Losowanie obrazka błędu =====================
+function getRandomErrorImage() {
+  if (!appConfig || !Array.isArray(appConfig.errorImages) || appConfig.errorImages.length === 0) {
+    return "img/errors/default.png";
+  }
+  
+  const randomIndex = Math.floor(Math.random() * appConfig.errorImages.length);
+  return appConfig.errorImages[randomIndex];
+}
+
+// ===================== Ładowanie opcjonalnych obrazków zadań =====================
+function tryLoadTaskImage(date, taskIndex) {
+  const imgElement = document.getElementById(`taskImage${taskIndex}`);
+  if (!imgElement) return;
+
+  const imagePath = getImagePath(date, `task${taskIndex + 1}.png`);
+
+  // Resetuj stan
+  imgElement.classList.add('hidden');
+  imgElement.src = '';
+
+  // Testowe ładowanie obrazka
+  const testImg = new Image();
+  
+  testImg.onload = () => {
+    imgElement.src = imagePath;
+    imgElement.classList.remove('hidden');
+  };
+  
+  testImg.onerror = () => {
+    // Obrazek nie istnieje - pozostaje ukryty
+    imgElement.classList.add('hidden');
+  };
+  
+  testImg.src = imagePath;
+}
+
+// ===================== Imię użytkownika =====================
+function ensurePlayerName() {
+  return new Promise((resolve) => {
+    const storedName = localStorage.getItem("player_name");
+    const nameLabel = document.getElementById("nameLabel");
+    const overlay = document.getElementById("nameOverlay");
+    const input = document.getElementById("nameInput");
+    const btn = document.getElementById("saveNameButton");
+
+    if (storedName) {
+      playerName = storedName;
+      nameLabel.innerText = playerName;
+      overlay.classList.add("hidden");
+      resolve();
+      return;
+    }
+
+    overlay.classList.remove("hidden");
+
+    btn.addEventListener(
+      "click",
+      () => {
+        const val = (input.value || "").trim();
+        if (!val) {
+          alert("Podaj imię.");
+          return;
         }
 
-        // Brak imienia -> pokaż overlay
-        overlay.classList.remove("hidden");
-
-        btn.addEventListener("click", () => {
-            const val = (input.value || "").trim();
-            if (!val) {
-                alert("Podaj imię.");
-                return;
-            }
-
-            playerName = val;
-            localStorage.setItem("player_name", playerName);
-            nameLabel.innerText = playerName;
-            overlay.classList.add("hidden");
-            resolve();
-        }, { once: true });
-    });
+        playerName = val;
+        localStorage.setItem("player_name", playerName);
+        nameLabel.innerText = playerName;
+        overlay.classList.add("hidden");
+        resolve();
+      },
+      { once: true }
+    );
+  });
 }
 
 // ===================== Wczytanie progresu gracza z Supabase =====================
 async function loadPlayerByName(name) {
-    try {
-        const { data, error } = await supabaseClient
-            .from("players")
-            .select("*")
-            .eq("name", name)
-            .limit(1);
+  try {
+    const { data, error } = await supabaseClient
+      .from("players")
+      .select("*")
+      .eq("name", name)
+      .maybeSingle();
 
-        if (error) {
-            console.error("Błąd SELECT players:", error);
-            return null;
-        }
-
-        if (!data || data.length === 0) {
-            return null;
-        }
-
-        return data[0];
-    } catch (e) {
-        console.error("Wyjątek przy loadPlayerByName:", e);
-        return null;
+    if (error) {
+      console.error("Błąd SELECT players:", error);
+      return null;
     }
+
+    return data;
+  } catch (e) {
+    console.error("Wyjątek przy loadPlayerByName:", e);
+    return null;
+  }
+}
+
+// ===================== WELCOME PANEL =====================
+function updateWelcomeTexts() {
+  const titleEl = document.getElementById("welcomeTitle");
+  const buttonEl = document.getElementById("welcomeButton");
+
+  if (titleEl && appConfig.welcomeTitle) {
+    titleEl.innerText = appConfig.welcomeTitle;
+  }
+
+  if (buttonEl && appConfig.welcomeButton) {
+    buttonEl.innerText = appConfig.welcomeButton;
+  }
+}
+
+function setupWelcomeListener() {
+  const btn = document.getElementById("welcomeButton");
+  const overlay = document.getElementById("welcomeOverlay");
+
+  if (btn) {
+    btn.addEventListener("click", () => {
+      overlay.classList.add("hidden");
+      showIntroPanel();
+    });
+  }
+}
+
+function showWelcomePanel() {
+  const overlay = document.getElementById("welcomeOverlay");
+  overlay.classList.remove("hidden");
+}
+
+// ===================== INTRO PANEL =====================
+function setupIntroListeners() {
+  const closeBtn = document.getElementById("introCloseButton");
+  const playBtn = document.getElementById("playAudioButton");
+  const overlay = document.getElementById("introOverlay");
+  const audio = document.getElementById("introAudio");
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      overlay.classList.add("hidden");
+      // Zatrzymaj audio przy zamknięciu
+      if (audio && audio.src) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    });
+  }
+
+  if (playBtn) {
+    playBtn.addEventListener("click", () => {
+      if (audio && audio.src) {
+        audio.currentTime = 0;
+        audio.play().catch((err) => {
+          console.warn("Nie udało się odtworzyć audio:", err);
+        });
+      }
+    });
+  }
+}
+
+function showIntroPanel() {
+  const overlay = document.getElementById("introOverlay");
+  const img = document.getElementById("introImage");
+  const audio = document.getElementById("introAudio");
+  const textEl = document.getElementById("introText");
+  const closeBtn = document.getElementById("introCloseButton");
+  const playBtn = document.getElementById("playAudioButton");
+
+  // ========== BRAK ZADANIA NA DZIŚ ==========
+  if (!currentPuzzle) {
+    if (img) {
+      img.src = "img/no-puzzle.png";
+      img.alt = "Brak zadania";
+    }
+
+    if (textEl) {
+      textEl.innerText = "Skontaktuj się z agentem TW ;)";
+    }
+
+    if (audio) {
+      audio.src = "";
+    }
+
+    if (closeBtn) {
+      closeBtn.innerText = "Rozumiem";
+    }
+
+    // Ukryj przycisk audio gdy brak zadania
+    if (playBtn) {
+      playBtn.classList.add("hidden");
+    }
+
+    overlay.classList.remove("hidden");
+    return;
+  }
+
+  // ========== NORMALNE ZADANIE ==========
+  if (img) {
+    img.src = getImagePath(gameDay, "intro.png");
+    img.alt = "Powitanie";
+  }
+
+  if (currentPuzzle.introText && textEl) {
+    textEl.innerText = currentPuzzle.introText;
+  }
+
+  if (currentPuzzle.introAudio && audio) {
+    audio.src = currentPuzzle.introAudio;
+    audio.currentTime = 0;
+    
+    // Pokaż przycisk audio jeśli jest plik
+    if (playBtn) {
+      playBtn.classList.remove("hidden");
+    }
+  } else {
+    // Ukryj przycisk audio jeśli brak pliku
+    if (playBtn) {
+      playBtn.classList.add("hidden");
+    }
+  }
+
+  if (closeBtn) {
+    closeBtn.innerText = "Zaczynamy!";
+  }
+
+  overlay.classList.remove("hidden");
+
+  // ========== USUNIĘTE AUTO-ODTWARZANIE ==========
+  // Audio odtwarza się tylko po kliknięciu przycisku "Odsłuchaj Wiadomość"
+}
+
+// ===================== RESULT POPUP =====================
+function setupResultListeners() {
+  const closeBtn = document.getElementById("closeResultButton");
+  const overlay = document.getElementById("resultPopup");
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      overlay.classList.add("hidden");
+    });
+  }
+}
+
+function showResultPopup(isSuccess, rewardChar = null) {
+  const overlay = document.getElementById("resultPopup");
+  const img = document.getElementById("resultImage");
+  const textEl = document.getElementById("resultText");
+  const rewardSection = document.getElementById("rewardSection");
+  const rewardLabel = document.getElementById("rewardLetterLabel");
+
+  if (isSuccess) {
+    // ========== SUKCES ==========
+    if (img) {
+      img.src = getImagePath(gameDay, "success.png");
+      img.alt = "Sukces";
+    }
+
+    if (textEl && currentPuzzle.successText) {
+      textEl.innerText = currentPuzzle.successText;
+    }
+
+    if (rewardSection) {
+      rewardSection.classList.remove("hidden");
+    }
+
+    if (rewardLabel && rewardChar) {
+      rewardLabel.innerText = rewardChar;
+    }
+  } else {
+    // ========== BŁĄD ==========
+    if (img) {
+      img.src = getRandomErrorImage();
+      img.alt = "Błąd";
+    }
+
+    if (textEl && appConfig.errorText) {
+      textEl.innerText = appConfig.errorText;
+    }
+
+    if (rewardSection) {
+      rewardSection.classList.add("hidden");
+    }
+  }
+
+  overlay.classList.remove("hidden");
 }
 
 // ===================== Render zadań =====================
 function renderPuzzleUI() {
-    currentPuzzle = appConfig.puzzles.find(p => p.date === gameDay);
+  currentPuzzle = appConfig.puzzles.find((p) => p.date === gameDay);
 
-    if (!currentPuzzle) {
-        document.getElementById("taskText0").innerText = "Brak zadania na ten dzień.";
-        document.getElementById("taskText1").innerText = "";
-        document.getElementById("taskText2").innerText = "";
-        disableInputs();
-        return;
-    }
+  if (!currentPuzzle) {
+    document.getElementById("taskText0").innerText = "";
+    document.getElementById("taskText1").innerText = "";
+    document.getElementById("taskText2").innerText = "";
+    disableInputs();
+    hideMainUI();
+    return;
+  }
 
-    currentPuzzle.tasks.forEach((t, idx) => {
-        const el = document.getElementById(`taskText${idx}`);
-        if (el) el.innerText = t;
-    });
+  // Renderuj teksty zadań
+  currentPuzzle.tasks.forEach((t, idx) => {
+    const el = document.getElementById(`taskText${idx}`);
+    if (el) el.innerText = t;
+  });
+
+  // Próbuj załadować opcjonalne obrazki zadań
+  for (let i = 0; i < 3; i++) {
+    tryLoadTaskImage(gameDay, i);
+  }
+}
+
+// ===================== Ukrycie głównego UI =====================
+function hideMainUI() {
+  const tasksContainer = document.querySelector(".tasks-container");
+  const buttonContainer = document.querySelector(".button-container");
+
+  if (tasksContainer) tasksContainer.style.display = "none";
+  if (buttonContainer) buttonContainer.style.display = "none";
 }
 
 // ===================== Wyświetlanie liter / hasła =====================
 function updateLettersLabel() {
-    const label = document.getElementById("lettersLabel");
-    const final = appConfig.finalSolution;
+  const label = document.getElementById("lettersLabel");
 
-    const lettersCount = playerRow ? (playerRow.letters || "").length : 0;
-    let pattern = "";
+  if (!appConfig || !appConfig.finalSolution) {
+    label.innerText = "";
+    return;
+  }
 
-    for (let i = 0; i < final.length; i++) {
-        if (i < lettersCount) {
-            pattern += final[i];
-        } else {
-            pattern += "_";
-        }
-        pattern += " ";
+  const final = appConfig.finalSolution;
+  const unlocked =
+    playerRow && Array.isArray(playerRow.letter_indexes)
+      ? playerRow.letter_indexes
+      : [];
+
+  let pattern = "";
+
+  for (let i = 0; i < final.length; i++) {
+    const ch = final[i];
+
+    if (ch === " ") {
+      pattern += "   ";
+      continue;
     }
 
-    label.innerText = pattern.trim();
+    if (unlocked.includes(i)) {
+      pattern += ch + " ";
+    } else {
+      pattern += "_ ";
+    }
+  }
+
+  label.innerText = pattern.trim();
 }
 
-// ===================== Blokada inputów przy braku zadania =====================
+// ===================== Blokada inputów =====================
 function disableInputs() {
-    for (let i = 0; i < 3; i++) {
-        const input = document.getElementById(`answer${i}`);
-        if (input) input.disabled = true;
-    }
-    const btn = document.getElementById("checkButton");
-    if (btn) btn.disabled = true;
+  for (let i = 0; i < 3; i++) {
+    const input = document.getElementById(`answer${i}`);
+    if (input) input.disabled = true;
+  }
+  const btn = document.getElementById("checkButton");
+  if (btn) btn.disabled = true;
 }
 
-// ===================== Aktualizacja progresu w bazie (tylko przy poprawnej) =====================
+// ===================== Aktualizacja progresu w bazie =====================
 async function updatePlayerAfterSolve() {
-    // jeśli nie ma jeszcze rekordu w players -> tworzymy pierwszy
-    if (!playerRow) {
-        const { data, error } = await supabaseClient
-            .from("players")
-            .insert([{
-                name: playerName,
-                letters: currentPuzzle.rewardLetter,
-                solved_days: [gameDay]
-            }])
-            .select()
-            .single();
+  const rewardIndex = currentPuzzle.rewardIndex;
 
-        if (error) {
-            console.error("Błąd INSERT players:", error);
-            return;
-        }
-
-        playerRow = data;
-        return;
-    }
-
-    // jeśli rekord istnieje
-    const alreadySolved = (playerRow.solved_days || []).includes(gameDay);
-    if (alreadySolved) {
-        // tego dnia już był progres, nie dodajemy kolejnej litery
-        return;
-    }
-
-    const newLetters = (playerRow.letters || "") + currentPuzzle.rewardLetter;
-    const newSolved = [...(playerRow.solved_days || []), gameDay];
-
+  if (!playerRow) {
     const { data, error } = await supabaseClient
-        .from("players")
-        .update({
-            letters: newLetters,
-            solved_days: newSolved
-        })
-        .eq("id", playerRow.id)
-        .select()
-        .single();
+      .from("players")
+      .insert([
+        {
+          name: playerName,
+          letter_indexes: [rewardIndex],
+          solved_days: [gameDay],
+        },
+      ])
+      .select()
+      .single();
 
     if (error) {
-        console.error("Błąd UPDATE players:", error);
-        return;
+      console.error("Błąd INSERT players:", error);
+      return;
     }
 
     playerRow = data;
+    return;
+  }
+
+  const alreadySolved = (playerRow.solved_days || []).includes(gameDay);
+  if (alreadySolved) {
+    return;
+  }
+
+  const currentIndexes = Array.isArray(playerRow.letter_indexes)
+    ? playerRow.letter_indexes
+    : [];
+
+  const newIndexes = currentIndexes.includes(rewardIndex)
+    ? currentIndexes
+    : [...currentIndexes, rewardIndex];
+
+  const newSolved = [...(playerRow.solved_days || []), gameDay];
+
+  const { data, error } = await supabaseClient
+    .from("players")
+    .update({
+      letter_indexes: newIndexes,
+      solved_days: newSolved,
+    })
+    .eq("id", playerRow.id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("Błąd UPDATE players:", error);
+    return;
+  }
+
+  playerRow = data;
 }
 
 // ===================== Sprawdzanie odpowiedzi =====================
 async function onCheckClick() {
-    if (!currentPuzzle) return;
+  if (!currentPuzzle) return;
 
-    const userAnswers = [
-        document.getElementById("answer0").value.trim().toUpperCase(),
-        document.getElementById("answer1").value.trim().toUpperCase(),
-        document.getElementById("answer2").value.trim().toUpperCase()
-    ];
+  const userAnswers = [
+    document.getElementById("answer0").value.trim().toUpperCase(),
+    document.getElementById("answer1").value.trim().toUpperCase(),
+    document.getElementById("answer2").value.trim().toUpperCase(),
+  ];
 
-    const correctAnswers = currentPuzzle.answers.map(a => a.toUpperCase());
-    const allCorrect = userAnswers.every((ans, i) => ans === correctAnswers[i]);
+  const correctAnswers = currentPuzzle.answers.map((a) => a.toUpperCase());
+  const allCorrect = userAnswers.every((ans, i) => ans === correctAnswers[i]);
 
-    if (!allCorrect) {
-        alert("Nie wszystkie odpowiedzi są poprawne. Spróbuj ponownie.");
-        // NIE zapisujemy nic w bazie
-        return;
-    }
+  if (!allCorrect) {
+    showResultPopup(false);
+    return;
+  }
 
-    // Zapis tylko dla poprawnych odpowiedzi:
-    await updatePlayerAfterSolve();
-    updateLettersLabel();
+  await updatePlayerAfterSolve();
+  updateLettersLabel();
 
-    // Pokazujemy popup z literą (zawsze tę samą dla danego dnia)
-    document.getElementById("rewardLetterLabel").innerText = currentPuzzle.rewardLetter;
-    document.getElementById("successPopup").classList.remove("hidden");
+  const final = appConfig.finalSolution;
+  const rewardIndex = currentPuzzle.rewardIndex;
+  const rewardChar =
+    typeof rewardIndex === "number" && rewardIndex >= 0 && rewardIndex < final.length
+      ? final[rewardIndex]
+      : "?";
+
+  showResultPopup(true, rewardChar);
 }
-

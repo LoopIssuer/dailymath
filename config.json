@@ -1,47 +1,60 @@
 {
   "finalSolution": "ROWER",
+  "welcomeTitle": "TAJEMNICZA MISJA",
+  "welcomeButton": "GOTÓW NA WYZWANIE!",
+  "errorImages": [
+    "img/errors/error1.png",
+    "img/errors/error2.png",
+    "img/errors/error3.png",
+    "img/errors/error4.png",
+    "img/errors/error5.png"
+  ],
+  "errorText": "Niestety, odpowiedzi są błędne. Spróbuj ponownie!",
   "puzzles": [
     {
       "date": "2025-12-08",
-      "tasks": [
-        "Zadanie na 08.12 #1",
-        "Zadanie na 08.12 #2",
-        "Zadanie na 08.12 #3"
-      ],
-      "answers": [
-        "KOT",
-        "DRZEWO",
-        "RZEKA"
-      ],
-      "rewardLetter": "R"
+      "introAudio": "audio/intro-2025-12-08.mp3",
+      "introText": "Witaj w poniedziałkowej zagadce!",
+      "tasks": ["Zadanie na 08.12 #1", "Zadanie na 08.12 #2", "Zadanie na 08.12 #3"],
+      "answers": ["1", "2", "3"],
+      "rewardIndex": 0,
+      "successText": "Świetnie! Poniedziałkowa zagadka rozwiązana!"
     },
     {
       "date": "2025-12-09",
-      "tasks": [
-        "Zadanie na 09.12 #1",
-        "Zadanie na 09.12 #2",
-        "Zadanie na 09.12 #3"
-      ],
-      "answers": [
-        "DOM",
-        "SAMOCHOD",
-        "KRZESLO"
-      ],
-      "rewardLetter": "O"
+      "introAudio": "audio/intro-2025-12-09.mp3",
+      "introText": "Wtorkowe wyzwanie – powodzenia!",
+      "tasks": ["Zadanie na 09.12 #1", "Zadanie na 09.12 #2", "Zadanie na 09.12 #3"],
+      "answers": ["1", "2", "3"],
+      "rewardIndex": 1,
+      "successText": "Brawo! Wtorkowe wyzwanie zaliczone!"
     },
-	    {
+    {
       "date": "2025-12-10",
-      "tasks": [
-        "Zadanie na 10.12 #1",
-        "Zadanie na 10.12 #2",
-        "Zadanie na 10.12 #3"
-      ],
-      "answers": [
-        "1",
-        "2",
-        "3"
-      ],
-      "rewardLetter": "W"
+      "introAudio": "audio/intro-2025-12-10.mp3",
+      "introText": "Środowa zagadka czeka!",
+      "tasks": ["Zadanie na 10.12 #1", "Zadanie na 10.12 #2", "Zadanie na 10.12 #3"],
+      "answers": ["1", "2", "3"],
+      "rewardIndex": 2,
+      "successText": "Doskonale! Środa za Tobą!"
+    },
+    {
+      "date": "2025-12-11",
+      "introAudio": "audio/intro-2025-12-11.mp3",
+      "introText": "Czwartkowa łamigłówka – czas na kolejną literę!",
+      "tasks": ["Zadanie na 11.12 #1", "Zadanie na 11.12 #2", "Zadanie na 11.12 #3"],
+      "answers": ["1", "2", "3"],
+      "rewardIndex": 3,
+      "successText": "Super! Czwartkowa łamigłówka pokonana!"
+    },
+    {
+      "date": "2025-12-12",
+      "introAudio": "audio/intro-2025-12-12.mp3",
+      "introText": "Agencie! Jakiś kawałek metalu o nazwie Ultron przejął kontrolę nad robotami na Głównej Stacji Kolejowej. Masz zestaw zadań! Rozwiąż je, a uzyskane hasło wstrzyknie się do ich systemu i je zdezaktywuje. Nie zawiedź mnie!",
+      "tasks": ["Zadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie na 12.12 #1", "Zadanie na Zadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie na12.12 #2", "ZadanieZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie na na 12.12 #3"],
+      "answers": ["1", "2", "3"],
+      "rewardIndex": 4,
+      "successText": "Fantastycznie! Hasło kompletne!"
     }
   ]
 }

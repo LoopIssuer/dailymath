@@ -1,0 +1,101 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Open-Xchange//7.10.6-Rev75//EN
+BEGIN:VTIMEZONE
+TZID:Europe/Warsaw
+LAST-MODIFIED:20250410T142247Z
+TZURL:https://www.tzurl.org/zoneinfo-outlook/Europe/Warsaw
+X-LIC-LOCATION:Europe/Warsaw
+BEGIN:DAYLIGHT
+TZNAME:CEST
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZNAME:CET
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTAMP:20251209T135301Z
+ATTENDEE;CN=Pawel Warczynski [Ext];PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPA
+ NT;RSVP=TRUE;EMAIL=pawel.warczynski@ext.frontex.europa.eu:mailto:pawel.war
+ czynski@ext.frontex.europa.eu
+ATTENDEE;CN=aleksander.krys@apzumi.pl;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTIC
+ IPANT;RSVP=TRUE;EMAIL=aleksander.krys@apzumi.pl:mailto:aleksander.krys@apz
+ umi.pl
+ATTENDEE;CN=Malwina Charko;PARTSTAT=NEEDS-ACTION;ROLE=REQ-PARTICIPANT;RSVP=
+ TRUE;EMAIL=malwina.charko@apzumi.com:mailto:malwina.charko@apzumi.com
+ATTENDEE;CN=tomasz.wozniak@apzumi.pl;PARTSTAT=ACCEPTED;ROLE=REQ-PARTICIPANT
+ ;CUTYPE=INDIVIDUAL;EMAIL=tomasz.wozniak@apzumi.pl:mailto:tomasz.wozniak@ap
+ zumi.pl
+CLASS:PUBLIC
+CREATED:20251209T135658Z
+DESCRIPTION:\n_____________________________________________________________
+ ___________________\nMicrosoft Teams Need help?<https://aka.ms/JoinTeamsMe
+ eting?omkt=en-US>\nJoin the meeting now<https://teams.microsoft.com/l/meet
+ up-join/19%3ameeting_YjIzZTc1MzctNThiMC00MDJlLTgzMGUtNTlmOGEzNmNlODAw%40th
+ read.v2/0?context=%7b%22Tid%22%3a%220676d0d8-a754-4412-9ab7-c346227e0b56%2
+ 2%2c%22Oid%22%3a%22a3824521-6b67-4c67-acb4-5d881539737f%22%7d>\nMeeting ID
+ : 386 091 719 190 25\nPasscode: FF6fY3eg\n________________________________
+ \nFor organizers: Meeting options<https://teams.microsoft.com/meetingOptio
+ ns/?organizerId=a3824521-6b67-4c67-acb4-5d881539737f&tenantId=0676d0d8-a75
+ 4-4412-9ab7-c346227e0b56&threadId=19_meeting_YjIzZTc1MzctNThiMC00MDJlLTgzM
+ GUtNTlmOGEzNmNlODAw@thread.v2&messageId=0&language=en-US>\n_______________
+ _________________________________________________________________\n\n--\nF
+ abrity S.A.\nul. Domaniewska 44A\, 02-672 Warszawa\ntel. +48 22 448 70 00\
+ , faks +48 22 448 71 01\ne-mail: biuro@fabrity.pl<mailto:biuro@fabrity.pl>
+  www.fabrity.com<http://www.fabrity.com/>\nZarejestrowana w Sadzie Rejonow
+ ym dla M. St. Warszawy\, XIII Wydzial Gospodarczy KRS pod numerem KRS 0000
+ 059690\nNIP 951-19-83-801\, Regon 016378720\nKapital zakladowy: 2.780.396\
+ ,00 zł (oplacony w calosci)\n\n\nTreść tej wiadomości wraz z ewentualnymi 
+ załącznikami zawiera informacje przeznaczone tylko dla wymienionego w niej
+  adresata i może zawierać informacje\, które są poufne oraz prawnie chroni
+ one.\nUjawnianie\, rozpowszechnianie oraz powielanie w jakikolwiek sposób 
+ w całości lub w części wiadomości wymaga pisemnej zgody Fabrity S. A. Jeże
+ li nie są Państwo jej adresatem\, bądź otrzymali ją przez pomyłkę\, prosim
+ y o powiadomienie o tym nadawcy.\n
+DTEND;TZID=Europe/Warsaw:20251210T110000
+DTSTART;TZID=Europe/Warsaw:20251210T103000
+LAST-MODIFIED:20251209T135743Z
+LOCATION:Microsoft Teams Meeting
+ORGANIZER;CN=Konrad Dworecki;EMAIL=Konrad.Dworecki@fabrity.pl:mailto:Konrad
+ .Dworecki@fabrity.pl
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:RRApp - introduction
+TRANSP:OPAQUE
+UID:040000008200E00074C5B7101A82E00800000000105C135F1B69DC01000000000000000
+ 0100000005725AD7887D4474AAC2CBB0321D2FF5E
+X-MICROSOFT-CDO-BUSYSTATUS:TENTATIVE
+PRIORITY:5
+X-MICROSOFT-CDO-APPT-SEQUENCE:0
+X-MICROSOFT-CDO-OWNERAPPTID:-206977047
+X-MICROSOFT-CDO-INTENDEDSTATUS:BUSY
+X-MICROSOFT-CDO-IMPORTANCE:1
+X-MICROSOFT-CDO-INSTTYPE:0
+X-MICROSOFT-SKYPETEAMSMEETINGURL:https://teams.microsoft.com/l/meetup-join/
+ 19%3ameeting_YjIzZTc1MzctNThiMC00MDJlLTgzMGUtNTlmOGEzNmNlODAw%40thread.v2/
+ 0?context=%7b%22Tid%22%3a%220676d0d8-a754-4412-9ab7-c346227e0b56%22%2c%22O
+ id%22%3a%22a3824521-6b67-4c67-acb4-5d881539737f%22%7d
+X-MICROSOFT-SCHEDULINGSERVICEUPDATEURL:https://api.scheduler.teams.microsof
+ t.com/teams/0676d0d8-a754-4412-9ab7-c346227e0b56/a3824521-6b67-4c67-acb4-5
+ d881539737f/19_meeting_YjIzZTc1MzctNThiMC00MDJlLTgzMGUtNTlmOGEzNmNlODAw@th
+ read.v2/0
+X-MICROSOFT-SKYPETEAMSPROPERTIES:{"cid":"19:meeting_YjIzZTc1MzctNThiMC00MDJ
+ lLTgzMGUtNTlmOGEzNmNlODAw@thread.v2"\,"private":true\,"type":0\,"mid":0\,"
+ rid":0\,"uid":null}
+X-MICROSOFT-DONOTFORWARDMEETING:FALSE
+X-MICROSOFT-DISALLOW-COUNTER:FALSE
+X-MICROSOFT-REQUESTEDATTENDANCEMODE:DEFAULT
+X-MICROSOFT-ISRESPONSEREQUESTED:TRUE
+X-MICROSOFT-LOCATIONS:[ { "DisplayName" : "Microsoft Teams Meeting"\, "Loca
+ tionAnnotation" : ""\, "LocationSource" : 0\, "Unresolved" : false\, "Loca
+ tionUri" : "" } ]
+END:VEVENT
+END:VCALENDAR
