@@ -35,7 +35,7 @@ export function showAlreadySolvedPanel(playerName, appConfig, areAllLettersUnloc
 
   if (textEl) {
     if (areAllLettersUnlocked) {
-      textEl.innerText = `🎉 Gratulacje, Agencie ${playerName}! Odkryłeś całe hasło: "${appConfig.finalSolution}"! Misja zakończona sukcesem! \nSkontaktuj się z Agentem TW! `;
+      textEl.innerText = `🎉 Gratulacje, Agencie ${playerName}! Odkryłeś całe hasło: "${appConfig.finalSolution}"! Rozszyfruj je kodem Cezara-1! \nPotem skontaktuj się z Agentem TW i przekaż rozszyfrowaną wiadomość! `;
     } else {
       textEl.innerText = `Agencie ${playerName}, dzisiejsze zadanie zostało już rozwiązane! Wróć jutro po nowe wyzwanie. Ultron nie śpi, ale Ty zasłużyłeś na odpoczynek!`;
     }
