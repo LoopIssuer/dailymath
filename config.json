@@ -9,52 +9,37 @@
     "img/errors/error4.png",
     "img/errors/error5.png"
   ],
-  "errorText": "Niestety, odpowiedzi są błędne. Spróbuj ponownie!",
+  "errorText": "Niestety, odpowiedzi są błędne. \nUltron nadal nie jest powstrzymany!\n Spróbuj ponownie!",
   "puzzles": [
     {
-      "date": "2025-12-08",
-      "introAudio": "audio/intro-2025-12-08.mp3",
-      "introText": "Witaj w poniedziałkowej zagadce!",
-      "tasks": ["Zadanie na 08.12 #1", "Zadanie na 08.12 #2", "Zadanie na 08.12 #3"],
-      "answers": ["1", "2", "3"],
-      "rewardIndex": 0,
-      "successText": "Świetnie! Poniedziałkowa zagadka rozwiązana!"
-    },
-    {
-      "date": "2025-12-09",
-      "introAudio": "audio/intro-2025-12-09.mp3",
-      "introText": "Wtorkowe wyzwanie – powodzenia!",
-      "tasks": ["Zadanie na 09.12 #1", "Zadanie na 09.12 #2", "Zadanie na 09.12 #3"],
-      "answers": ["1", "2", "3"],
-      "rewardIndex": 1,
-      "successText": "Brawo! Wtorkowe wyzwanie zaliczone!"
-    },
-    {
-      "date": "2025-12-10",
-      "introAudio": "audio/intro-2025-12-10.mp3",
-      "introText": "Środowa zagadka czeka!",
-      "tasks": ["Zadanie na 10.12 #1", "Zadanie na 10.12 #2", "Zadanie na 10.12 #3"],
-      "answers": ["1", "2", "3"],
-      "rewardIndex": 2,
-      "successText": "Doskonale! Środa za Tobą!"
-    },
-    {
       "date": "2025-12-11",
-      "introAudio": "audio/intro-2025-12-11.mp3",
-      "introText": "Czwartkowa łamigłówka – czas na kolejną literę!",
-      "tasks": ["Zadanie na 11.12 #1", "Zadanie na 11.12 #2", "Zadanie na 11.12 #3"],
-      "answers": ["1", "2", "3"],
-      "rewardIndex": 3,
-      "successText": "Super! Czwartkowa łamigłówka pokonana!"
+      "introText": "Agencie! Tu Tony Stark. Ultron ma kontrolę nad systemami na Głównej Stacji Kolejowej. Masz zestaw zadań! Rozwiąż je, a uzyskany kod wstrzyknie się do ich systemu i je zdezaktywuje. Nie zawiedź mnie!",
+      "tasks": ["Stacja kolejowa jest atakowana przez 153 roboty Ultrona oraz samego Ultrona. Żeby pokonać jednego robota Iron Man musi użyć promienia laserowego o mocy 5 kilowatów.Do pokonania Ultrona potrzeba 347 KW. Ile mocy potrzebuje Iron Man by pokonać wszystkich?",
+      "W jednym wagonie mieści się 20 pasażerów. Na stacji jest 120 wagonów. Ewakuacja odbędzie się pojazdem Shield, który mieści 300 ludzi na raz. Ile razy pojazd Shield będzie musiał przylecieć na stację, by zabrać wszystkich?",
+       "Wprowadź rozwiązanie: 45+45-12-12+22+98-17+96="],
+      "answers": ["1120", "8", "265"],
+      "rewardIndex": 0,
+      "successText": "Wiadomość z ostatniej chwili! Wstrzyknąłeś kod! Agencie, roboty na stacji są zdezaktywowane! Twoja precyzja w obliczeniach jest godna Stark Tower! Jutro odezwę się ponownie!"
     },
     {
+      "date": "2025-12-13",
+      "introText": "Doskonała robota wczoraj! Teraz musisz się pospieszyć. Wysyłam Ci kod. Rozwiązanie to klucz do uruchomienia starego pojazdu Fantastycznej Czwórki, który jest jedynym sposobem, byś dotarł do mojej tajnej siedziby. Szybkie obliczenia to Twoja przepustka na Manhattan!",
+      "tasks": ["Jeden z robotów Fantastycznej Czwórki został zainfekowany przez wirus Ultrona. Reed Richards zaszyfrował numer tego robota w działaniu. Wpisz numer robota: VII+V-IV+10+VII+XII-3+I",
+      "Pojazd Fantastycznej Czwórki może poruszać się z prędkością 500 km/h, jeśli jest pusty. Każdy kilogram obciążenia spowalnia pojazd o 2km/h. Ile km/h osiągnie maksymalnie, jeśli wsiądzie do niego The Thing, który waży 220 kg?",
+       "Wprowadź rozwiązanie: 100+2*5-67+90-17-90-2*5+67+17-1"],
+      "answers": ["XI", "60", "99"],
+      "rewardIndex": 1,
+      "successText": "Niesamowite! Pojazd Fantastycznej Czwórki właśnie się uruchomił dzięki Twojej logice! Jesteś w drodze! Szybkość Twoich obliczeń jest imponująca, Agencie! Czekam na Ciebie w bazie!"
+    },
+        {
       "date": "2025-12-12",
-      "introAudio": "audio/intro-2025-12-12.mp3",
-      "introText": "Agencie! Jakiś kawałek metalu o nazwie Ultron przejął kontrolę nad robotami na Głównej Stacji Kolejowej. Masz zestaw zadań! Rozwiąż je, a uzyskane hasło wstrzyknie się do ich systemu i je zdezaktywuje. Nie zawiedź mnie!",
-      "tasks": ["Zadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie na 12.12 #1", "Zadanie na Zadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie na12.12 #2", "ZadanieZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie naZadanie na na 12.12 #3"],
-      "answers": ["1", "2", "3"],
-      "rewardIndex": 4,
-      "successText": "Fantastycznie! Hasło kompletne!"
+      "introText": "Ultron generuje energię, używając skomplikowanych wzorów. Twoje zadania to wzór na częstotliwość, która to zakłóci. Rozwiąż je precyzyjnie. Pamiętaj, tu nie ma miejsca na błąd – inaczej wybuchnie mi generator kawy!",
+      "tasks": ["Jeden z robotów Fantastycznej Czwórki został zainfekowany przez wirus Ultrona. Reed Richards zaszyfrował numer tego robota w działaniu. Wpisz numer robota: VII+V-IV+10+VII+XII-3+I",
+      "Pojazd Fantastycznej Czwórki może poruszać się z prędkością 500 km/h, jeśli jest pusty. Każdy kilogram obciążenia spowalnia pojazd o 2km/h. Jak szybko będzie się poruszał, jeśli wsiądzie do niego The Thing, który waży 220 kg?",
+       "Wprowadź rozwiązanie: 100+2*5-67+90-17-90-2*5+67+17-1"],
+      "answers": ["XI", "60", "99"],
+      "rewardIndex": 1,
+      "successText": "Mamy to! Twoja częstotliwość zadziałała! Ultron na moment stracił zasilanie w całym sektorze! Gratulacje, Młody Agencie, to była prawdziwa sztuka!"
     }
   ]
 }

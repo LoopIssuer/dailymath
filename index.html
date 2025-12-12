@@ -32,11 +32,10 @@
         <div class="popup-content">
             <img id="introImage" src="" alt="Powitanie" style="max-width: 100%; height: auto; margin-bottom: 16px;" />
             <p id="introText">Tekst intro z config.json</p>
-            <audio id="introAudio"></audio>
             
             <!-- PRZYCISKI INTRO -->
             <div class="intro-buttons">
-                <button id="playAudioButton" class="secondary-button hidden">
+                <button id="playAudioButton" class="secondary-button">
                     🔊 Odsłuchaj Wiadomość
                 </button>
                 <button id="introCloseButton">Zaczynamy!</button>
@@ -45,10 +44,10 @@
     </div>
 
     <!-- GÓRNA RAMKA Z DATĄ I IMIENIEM -->
-    <div class="date-box">
-        DATA DNIA GRY: <span id="dateLabel"></span><br />
-        UŻYTKOWNIK: <span id="nameLabel"></span>
-    </div>
+<div class="date-box">
+    DATA: <span id="dateLabel"></span><br />
+    AGENT: <span id="nameLabel"></span>
+</div>
 
     <!-- GŁÓWNY UKŁAD: ZADANIA PIONOWO -->
     <div class="tasks-container">
@@ -85,7 +84,7 @@
 
     <!-- DOLNA RAMKA Z HASŁEM / LITERAMI -->
     <div class="letters-box">
-        AKTUALNIE ZDOBYTE LITERY / HASŁO: <span id="lettersLabel"></span>
+        TAJNE HASŁO: <span id="lettersLabel"></span>
     </div>
 
     <!-- POPUP WYNIKU (sukces/błąd) -->
@@ -93,12 +92,20 @@
         <div class="popup-content">
             <img id="resultImage" src="" alt="Wynik" style="max-width: 100%; height: auto; margin-bottom: 16px;" />
             <p id="resultText"></p>
+            
             <!-- Sekcja z literą - widoczna tylko przy sukcesie -->
             <div id="rewardSection" class="hidden">
                 <p>Zdobywasz literę:</p>
                 <h2 id="rewardLetterLabel"></h2>
             </div>
-            <button id="closeResultButton">OK</button>
+            
+            <!-- PRZYCISKI WYNIKU -->
+            <div class="intro-buttons">
+                <button id="playResultAudioButton" class="secondary-button hidden">
+                    🔊 Odsłuchaj Wiadomość
+                </button>
+                <button id="closeResultButton">OK</button>
+            </div>
         </div>
     </div>
 

@@ -11,6 +11,44 @@ let currentPuzzle = null;
 let gameDay = null;
 let playerRow = null;
 let playerName = null;
+let voicesLoaded = false;
+let interferenceAudio = null;
+
+// ===================== INICJALIZACJA GŁOSÓW TTS =====================
+function initVoices() {
+  return new Promise((resolve) => {
+    if (!('speechSynthesis' in window)) {
+      resolve([]);
+      return;
+    }
+
+    const voices = window.speechSynthesis.getVoices();
+    
+    if (voices.length > 0) {
+      voicesLoaded = true;
+      resolve(voices);
+      return;
+    }
+
+    window.speechSynthesis.onvoiceschanged = () => {
+      voicesLoaded = true;
+      resolve(window.speechSynthesis.getVoices());
+    };
+  });
+}
+
+if ('speechSynthesis' in window) {
+  initVoices().then((voices) => {
+    console.log("Załadowano głosów:", voices.length);
+    const adam = voices.find(v => v.name.includes('Adam'));
+    if (adam) {
+      console.log("✅ Głos Adam dostępny:", adam.name);
+    } else {
+      console.log("⚠️ Głos Adam niedostępny, dostępne polskie głosy:");
+      voices.filter(v => v.lang.startsWith('pl')).forEach(v => console.log("  -", v.name));
+    }
+  });
+}
 
 // ===================== ENTRY POINT =====================
 window.addEventListener("DOMContentLoaded", async () => {
@@ -21,6 +59,11 @@ window.addEventListener("DOMContentLoaded", async () => {
     alert("Nie udało się wczytać konfiguracji gry.");
     return;
   }
+
+  // Przygotuj audio interference
+  interferenceAudio = new Audio("audio/interference.mp3");
+  interferenceAudio.loop = true;
+  interferenceAudio.volume = 0.3;
 
   // Ustaw teksty z configa dla panelu powitalnego
   updateWelcomeTexts();
@@ -88,11 +131,9 @@ function tryLoadTaskImage(date, taskIndex) {
 
   const imagePath = getImagePath(date, `task${taskIndex + 1}.png`);
 
-  // Resetuj stan
   imgElement.classList.add('hidden');
   imgElement.src = '';
 
-  // Testowe ładowanie obrazka
   const testImg = new Image();
   
   testImg.onload = () => {
@@ -101,7 +142,6 @@ function tryLoadTaskImage(date, taskIndex) {
   };
   
   testImg.onerror = () => {
-    // Obrazek nie istnieje - pozostaje ukryty
     imgElement.classList.add('hidden');
   };
   
@@ -204,27 +244,17 @@ function setupIntroListeners() {
   const closeBtn = document.getElementById("introCloseButton");
   const playBtn = document.getElementById("playAudioButton");
   const overlay = document.getElementById("introOverlay");
-  const audio = document.getElementById("introAudio");
 
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {
       overlay.classList.add("hidden");
-      // Zatrzymaj audio przy zamknięciu
-      if (audio && audio.src) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
+      stopAllAudio();
     });
   }
 
   if (playBtn) {
     playBtn.addEventListener("click", () => {
-      if (audio && audio.src) {
-        audio.currentTime = 0;
-        audio.play().catch((err) => {
-          console.warn("Nie udało się odtworzyć audio:", err);
-        });
-      }
+      playIntroMessage();
     });
   }
 }
@@ -232,40 +262,23 @@ function setupIntroListeners() {
 function showIntroPanel() {
   const overlay = document.getElementById("introOverlay");
   const img = document.getElementById("introImage");
-  const audio = document.getElementById("introAudio");
   const textEl = document.getElementById("introText");
   const closeBtn = document.getElementById("introCloseButton");
   const playBtn = document.getElementById("playAudioButton");
 
-  // ========== BRAK ZADANIA NA DZIŚ ==========
+  // 🔴 KLUCZOWA ZMIANA:
+  // Jeśli NIE ma zadania na ten dzień (brak w configu),
+  // w ogóle NIE pokazujemy panelu intro.
   if (!currentPuzzle) {
-    if (img) {
-      img.src = "img/no-puzzle.png";
-      img.alt = "Brak zadania";
+    if (overlay) {
+      overlay.classList.add("hidden");
     }
-
-    if (textEl) {
-      textEl.innerText = "Skontaktuj się z agentem TW ;)";
-    }
-
-    if (audio) {
-      audio.src = "";
-    }
-
-    if (closeBtn) {
-      closeBtn.innerText = "Rozumiem";
-    }
-
-    // Ukryj przycisk audio gdy brak zadania
-    if (playBtn) {
-      playBtn.classList.add("hidden");
-    }
-
-    overlay.classList.remove("hidden");
     return;
   }
 
-  // ========== NORMALNE ZADANIE ==========
+  // ─────────────────────────────
+  // Normalna ścieżka, gdy puzzle są
+  // ─────────────────────────────
   if (img) {
     img.src = getImagePath(gameDay, "intro.png");
     img.alt = "Powitanie";
@@ -275,19 +288,9 @@ function showIntroPanel() {
     textEl.innerText = currentPuzzle.introText;
   }
 
-  if (currentPuzzle.introAudio && audio) {
-    audio.src = currentPuzzle.introAudio;
-    audio.currentTime = 0;
-    
-    // Pokaż przycisk audio jeśli jest plik
-    if (playBtn) {
-      playBtn.classList.remove("hidden");
-    }
-  } else {
-    // Ukryj przycisk audio jeśli brak pliku
-    if (playBtn) {
-      playBtn.classList.add("hidden");
-    }
+  if (playBtn) {
+    playBtn.innerHTML = "🔊 Odsłuchaj Wiadomość";
+    playBtn.classList.remove("hidden");
   }
 
   if (closeBtn) {
@@ -295,19 +298,136 @@ function showIntroPanel() {
   }
 
   overlay.classList.remove("hidden");
+}
 
-  // ========== USUNIĘTE AUTO-ODTWARZANIE ==========
-  // Audio odtwarza się tylko po kliknięciu przycisku "Odsłuchaj Wiadomość"
+
+// ========== ODTWARZANIE WIADOMOŚCI INTRO ==========
+async function playIntroMessage() {
+  const textEl = document.getElementById("introText");
+
+  if (!textEl || !textEl.innerText) {
+    console.warn("Brak tekstu do odczytania");
+    return;
+  }
+
+  playInterferenceAudio();
+  await speakText(textEl.innerText);
+}
+
+// ========== ODTWARZANIE WIADOMOŚCI WYNIKU ==========
+async function playResultMessage() {
+  const textEl = document.getElementById("resultText");
+
+  if (!textEl || !textEl.innerText) {
+    console.warn("Brak tekstu do odczytania");
+    return;
+  }
+
+  playInterferenceAudio();
+  await speakText(textEl.innerText);
+}
+
+// ========== INTERFERENCE AUDIO ==========
+function playInterferenceAudio() {
+  if (interferenceAudio) {
+    interferenceAudio.currentTime = 0;
+    interferenceAudio.play().catch((err) => {
+      console.warn("Nie udało się odtworzyć interference.mp3:", err);
+    });
+  }
+}
+
+function stopInterferenceAudio() {
+  if (interferenceAudio) {
+    interferenceAudio.pause();
+    interferenceAudio.currentTime = 0;
+  }
+}
+
+// ========== ZATRZYMAJ WSZYSTKIE AUDIO ==========
+function stopAllAudio() {
+  stopInterferenceAudio();
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+// ========== SYNTEZATOR MOWY ==========
+async function speakText(text) {
+  if (!('speechSynthesis' in window)) {
+    alert("Twoja przeglądarka nie obsługuje syntezatora mowy.");
+    stopInterferenceAudio();
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  if (!voicesLoaded) {
+    await initVoices();
+  }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  
+  utterance.lang = 'pl-PL';
+  utterance.rate = 1.0;
+  utterance.pitch = 1.0;
+  utterance.volume = 1.0;
+
+  const voices = window.speechSynthesis.getVoices();
+  const adamVoice = voices.find(voice => 
+    voice.name.includes('Adam') && voice.lang.startsWith('pl')
+  );
+
+  if (adamVoice) {
+    utterance.voice = adamVoice;
+    console.log("Używam głosu:", adamVoice.name);
+  } else {
+    const msPolishVoice = voices.find(voice => 
+      voice.name.includes('Microsoft') && voice.lang.startsWith('pl')
+    );
+    
+    if (msPolishVoice) {
+      utterance.voice = msPolishVoice;
+      console.log("Adam niedostępny, używam:", msPolishVoice.name);
+    } else {
+      const anyPolishVoice = voices.find(voice => voice.lang.startsWith('pl'));
+      if (anyPolishVoice) {
+        utterance.voice = anyPolishVoice;
+        console.log("Brak głosu Microsoft, używam:", anyPolishVoice.name);
+      } else {
+        console.warn("Brak polskiego głosu, używam domyślnego");
+      }
+    }
+  }
+
+  utterance.onend = () => {
+    stopInterferenceAudio();
+  };
+
+  utterance.onerror = (event) => {
+    console.error('Błąd syntezatora mowy:', event);
+    stopInterferenceAudio();
+  };
+
+  window.speechSynthesis.speak(utterance);
 }
 
 // ===================== RESULT POPUP =====================
 function setupResultListeners() {
   const closeBtn = document.getElementById("closeResultButton");
+  const playBtn = document.getElementById("playResultAudioButton");
   const overlay = document.getElementById("resultPopup");
 
   if (closeBtn) {
     closeBtn.addEventListener("click", () => {
       overlay.classList.add("hidden");
+      stopAllAudio();
+    });
+  }
+
+  if (playBtn) {
+    playBtn.addEventListener("click", () => {
+      playResultMessage();
     });
   }
 }
@@ -318,6 +438,7 @@ function showResultPopup(isSuccess, rewardChar = null) {
   const textEl = document.getElementById("resultText");
   const rewardSection = document.getElementById("rewardSection");
   const rewardLabel = document.getElementById("rewardLetterLabel");
+  const playBtn = document.getElementById("playResultAudioButton");
 
   if (isSuccess) {
     // ========== SUKCES ==========
@@ -337,6 +458,11 @@ function showResultPopup(isSuccess, rewardChar = null) {
     if (rewardLabel && rewardChar) {
       rewardLabel.innerText = rewardChar;
     }
+
+    // Pokaż przycisk audio przy sukcesie
+    if (playBtn) {
+      playBtn.classList.remove("hidden");
+    }
   } else {
     // ========== BŁĄD ==========
     if (img) {
@@ -350,6 +476,11 @@ function showResultPopup(isSuccess, rewardChar = null) {
 
     if (rewardSection) {
       rewardSection.classList.add("hidden");
+    }
+
+    // Ukryj przycisk audio przy błędzie
+    if (playBtn) {
+      playBtn.classList.add("hidden");
     }
   }
 
@@ -369,13 +500,11 @@ function renderPuzzleUI() {
     return;
   }
 
-  // Renderuj teksty zadań
   currentPuzzle.tasks.forEach((t, idx) => {
     const el = document.getElementById(`taskText${idx}`);
     if (el) el.innerText = t;
   });
 
-  // Próbuj załadować opcjonalne obrazki zadań
   for (let i = 0; i < 3; i++) {
     tryLoadTaskImage(gameDay, i);
   }
