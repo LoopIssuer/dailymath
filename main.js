@@ -47,16 +47,23 @@ function generateMathTasks(seed) {
     let result = 0;
     
     for (let j = 0; j < numOperations; j++) {
-      // Liczby od 1 do 100
-      const num = Math.floor(rng() * 100) + 1;
+      let num;
       
       if (j === 0) {
+        // Pierwsza liczba: większa (30-100) żeby było więcej możliwości odejmowania
+        num = Math.floor(rng() * 71) + 30;
         expression = num.toString();
         result = num;
       } else {
+        // Kolejne liczby: 1-50 żeby zadanie nie było za trudne
+        num = Math.floor(rng() * 50) + 1;
+        
         // Losuj operator: + lub -
-        const isAdd = rng() > 0.5;
-        if (isAdd) {
+        const randomValue = rng();
+        const shouldAdd = randomValue > 0.5;
+        
+        // ✅ KLUCZOWE: Jeśli odejmowanie dałoby wynik < 0, wymuś dodawanie
+        if (shouldAdd || result - num < 0) {
           expression += ` + ${num}`;
           result += num;
         } else {
@@ -381,7 +388,7 @@ function showAlreadySolvedPanel() {
 
   if (textEl) {
     if (areAllLettersUnlocked()) {
-      textEl.innerText = `🎉 Gratulacje, Agencie ${playerName}! Odkryłeś całe hasło: "${appConfig.finalSolution}"! Misja zakończona sukcesem!`;
+      textEl.innerText = `🎉 Gratulacje, Agencie ${playerName}! Odkryłeś całe hasło: "${appConfig.finalSolution}"! Misja zakończona sukcesem! Skontaktuj się z Agentem TW, by otrzymać dalsze instrukcje!`;
     } else {
       textEl.innerText = `Agencie ${playerName}, dzisiejsze zadanie zostało już rozwiązane! Wróć jutro po nowe wyzwanie. Ultron nie śpi, ale Ty zasłużyłeś na odpoczynek!`;
     }
