@@ -573,7 +573,62 @@ body {
 .hidden {
     display: none !important;
 }
+/* ========= WALIDACJA ODPOWIEDZI ========= */
+.answer-input.correct {
+    border: 2px solid #00ff00;
+    background: rgba(0, 255, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
 
+.answer-input.incorrect {
+    border: 2px solid #ff0000;
+    background: rgba(255, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.validation-hint {
+    font-size: 0.9em;
+    margin-top: 5px;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.validation-hint.error {
+    color: #ff4444;
+    background: rgba(255, 0, 0, 0.1);
+}
+
+.validation-hint.success {
+    color: #00ff00;
+    background: rgba(0, 255, 0, 0.1);
+}
+
+/* Licznik błędów/poprawnych */
+.validation-summary {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.validation-summary .correct-count {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+.validation-summary .incorrect-count {
+    color: #ff4444;
+    font-weight: bold;
+}
 /* Responsywność dla przycisków intro */
 @media (max-width: 480px) {
     .intro-buttons {

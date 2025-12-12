@@ -44,15 +44,15 @@
     </div>
 
     <!-- GÓRNA RAMKA Z DATĄ I IMIENIEM -->
-<div class="date-box">
-    DATA: <span id="dateLabel"></span><br />
-    AGENT: <span id="nameLabel"></span>
-</div>
+    <div class="date-box">
+        DATA: <span id="dateLabel"></span><br />
+        AGENT: <span id="nameLabel"></span>
+    </div>
 
     <!-- GŁÓWNY UKŁAD: ZADANIA PIONOWO -->
     <div class="tasks-container">
         <!-- ZADANIE 1 -->
-        <div class="task-block">
+        <div class="task-block" id="taskBlock0">
             <div class="task-text" id="taskText0">Tutaj pojawi się zadanie 1</div>
             <img id="taskImage0" class="task-image hidden" alt="Ilustracja zadania 1" />
             <input class="answer-input" id="answer0" placeholder="Wpisz rozwiązanie..." />
@@ -61,7 +61,7 @@
         <div class="task-separator"></div>
 
         <!-- ZADANIE 2 -->
-        <div class="task-block">
+        <div class="task-block" id="taskBlock1">
             <div class="task-text" id="taskText1">Tutaj pojawi się zadanie 2</div>
             <img id="taskImage1" class="task-image hidden" alt="Ilustracja zadania 2" />
             <input class="answer-input" id="answer1" placeholder="Wpisz rozwiązanie..." />
@@ -70,10 +70,37 @@
         <div class="task-separator"></div>
 
         <!-- ZADANIE 3 -->
-        <div class="task-block">
+        <div class="task-block" id="taskBlock2">
             <div class="task-text" id="taskText2">Tutaj pojawi się zadanie 3</div>
             <img id="taskImage2" class="task-image hidden" alt="Ilustracja zadania 3" />
             <input class="answer-input" id="answer2" placeholder="Wpisz rozwiązanie..." />
+        </div>
+
+        <div class="task-separator" id="separator3" style="display: none;"></div>
+
+        <!-- ZADANIE 4 (tylko dla generic) -->
+        <div class="task-block hidden" id="taskBlock3">
+            <div class="task-text" id="taskText3">Tutaj pojawi się zadanie 4</div>
+            <img id="taskImage3" class="task-image hidden" alt="Ilustracja zadania 4" />
+            <input class="answer-input" id="answer3" placeholder="Wpisz rozwiązanie..." />
+        </div>
+
+        <div class="task-separator" id="separator4" style="display: none;"></div>
+
+        <!-- ZADANIE 5 (tylko dla generic) -->
+        <div class="task-block hidden" id="taskBlock4">
+            <div class="task-text" id="taskText4">Tutaj pojawi się zadanie 5</div>
+            <img id="taskImage4" class="task-image hidden" alt="Ilustracja zadania 5" />
+            <input class="answer-input" id="answer4" placeholder="Wpisz rozwiązanie..." />
+        </div>
+
+        <div class="task-separator" id="separator5" style="display: none;"></div>
+
+        <!-- ZADANIE 6 (tylko dla generic) -->
+        <div class="task-block hidden" id="taskBlock5">
+            <div class="task-text" id="taskText5">Tutaj pojawi się zadanie 6</div>
+            <img id="taskImage5" class="task-image hidden" alt="Ilustracja zadania 6" />
+            <input class="answer-input" id="answer5" placeholder="Wpisz rozwiązanie..." />
         </div>
     </div>
 
@@ -83,10 +110,10 @@
     </div>
 
     <!-- DOLNA RAMKA Z HASŁEM / LITERAMI -->
-<div class="letters-box">
-    TAJNE HASŁO: <span id="lettersLabel"></span>
-    <div id="congratsLabel" class="congrats-text hidden">🎉 Gratulacje!!! Skontaktuj się z Agentem TW, by otrzymać dalsze instrukcje! 🎉</div>
-</div>
+    <div class="letters-box">
+        TAJNE HASŁO: <span id="lettersLabel"></span>
+        <div id="congratsLabel" class="congrats-text hidden">🎉 Gratulacje! 🎉</div>
+    </div>
 
     <!-- POPUP WYNIKU (sukces/błąd) -->
     <div id="resultPopup" class="popup hidden">
@@ -110,6 +137,6 @@
         </div>
     </div>
 
-    <script src="main.js"></script>
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
