@@ -266,19 +266,29 @@ function showIntroPanel() {
   const closeBtn = document.getElementById("introCloseButton");
   const playBtn = document.getElementById("playAudioButton");
 
-  // 🔴 KLUCZOWA ZMIANA:
-  // Jeśli NIE ma zadania na ten dzień (brak w configu),
-  // w ogóle NIE pokazujemy panelu intro.
   if (!currentPuzzle) {
-    if (overlay) {
-      overlay.classList.add("hidden");
+    if (img) {
+      img.src = "img/no-puzzle.png";
+      img.alt = "Brak zadania";
     }
+
+    if (textEl) {
+      textEl.innerText = "Skontaktuj się z agentem TW ;)";
+    }
+
+    if (closeBtn) {
+      closeBtn.innerText = "Rozumiem";
+    }
+
+    if (playBtn) {
+      playBtn.innerHTML = "🔊 Odsłuchaj Wiadomość";
+      playBtn.classList.remove("hidden");
+    }
+
+    overlay.classList.remove("hidden");
     return;
   }
 
-  // ─────────────────────────────
-  // Normalna ścieżka, gdy puzzle są
-  // ─────────────────────────────
   if (img) {
     img.src = getImagePath(gameDay, "intro.png");
     img.alt = "Powitanie";
@@ -299,7 +309,6 @@ function showIntroPanel() {
 
   overlay.classList.remove("hidden");
 }
-
 
 // ========== ODTWARZANIE WIADOMOŚCI INTRO ==========
 async function playIntroMessage() {
