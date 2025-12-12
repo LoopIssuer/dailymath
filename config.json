@@ -14,9 +14,11 @@
     {
       "date": "2025-12-11",
       "introText": "Agencie! Tu Tony Stark. Ultron ma kontrolę nad systemami na Głównej Stacji Kolejowej. Masz zestaw zadań! Rozwiąż je, a uzyskany kod wstrzyknie się do ich systemu i je zdezaktywuje. Nie zawiedź mnie!",
-      "tasks": ["Stacja kolejowa jest atakowana przez 153 roboty Ultrona oraz samego Ultrona. Żeby pokonać jednego robota Iron Man musi użyć promienia laserowego o mocy 5 kilowatów.Do pokonania Ultrona potrzeba 347 KW. Ile mocy potrzebuje Iron Man by pokonać wszystkich?",
-      "W jednym wagonie mieści się 20 pasażerów. Na stacji jest 120 wagonów. Ewakuacja odbędzie się pojazdem Shield, który mieści 300 ludzi na raz. Ile razy pojazd Shield będzie musiał przylecieć na stację, by zabrać wszystkich?",
-       "Wprowadź rozwiązanie: 45+45-12-12+22+98-17+96="],
+      "tasks": [
+        "Stacja kolejowa jest atakowana przez 153 roboty Ultrona oraz samego Ultrona. Żeby pokonać jednego robota Iron Man musi użyć promienia laserowego o mocy 5 kilowatów. Do pokonania Ultrona potrzeba 347 KW. Ile mocy potrzebuje Iron Man by pokonać wszystkich?",
+        "W jednym wagonie mieści się 20 pasażerów. Na stacji jest 120 wagonów. Ewakuacja odbędzie się pojazdem Shield, który mieści 300 ludzi na raz. Ile razy pojazd Shield będzie musiał przylecieć na stację, by zabrać wszystkich?",
+        "Wprowadź rozwiązanie: 45+45-12-12+22+98-17+96="
+      ],
       "answers": ["1120", "8", "265"],
       "rewardIndex": 0,
       "successText": "Wiadomość z ostatniej chwili! Wstrzyknąłeś kod! Agencie, roboty na stacji są zdezaktywowane! Twoja precyzja w obliczeniach jest godna Stark Tower! Jutro odezwę się ponownie!"
@@ -24,22 +26,38 @@
     {
       "date": "2025-12-13",
       "introText": "Doskonała robota wczoraj! Teraz musisz się pospieszyć. Wysyłam Ci kod. Rozwiązanie to klucz do uruchomienia starego pojazdu Fantastycznej Czwórki, który jest jedynym sposobem, byś dotarł do mojej tajnej siedziby. Szybkie obliczenia to Twoja przepustka na Manhattan!",
-      "tasks": ["Jeden z robotów Fantastycznej Czwórki został zainfekowany przez wirus Ultrona. Reed Richards zaszyfrował numer tego robota w działaniu. Wpisz numer robota: VII+V-IV+10+VII+XII-3+I",
-      "Pojazd Fantastycznej Czwórki może poruszać się z prędkością 500 km/h, jeśli jest pusty. Każdy kilogram obciążenia spowalnia pojazd o 2km/h. Ile km/h osiągnie maksymalnie, jeśli wsiądzie do niego The Thing, który waży 220 kg?",
-       "Wprowadź rozwiązanie: 100+2*5-67+90-17-90-2*5+67+17-1"],
+      "tasks": [
+        "Jeden z robotów Fantastycznej Czwórki został zainfekowany przez wirus Ultrona. Reed Richards zaszyfrował numer tego robota w działaniu. Wpisz numer robota: VII+V-IV+10+VII+XII-3+I",
+        "Pojazd Fantastycznej Czwórki może poruszać się z prędkością 500 km/h, jeśli jest pusty. Każdy kilogram obciążenia spowalnia pojazd o 2km/h. Ile km/h osiągnie maksymalnie, jeśli wsiądzie do niego The Thing, który waży 220 kg?",
+        "Wprowadź rozwiązanie: 100+2*5-67+90-17-90-2*5+67+17-1"
+      ],
       "answers": ["XI", "60", "99"],
       "rewardIndex": 1,
       "successText": "Niesamowite! Pojazd Fantastycznej Czwórki właśnie się uruchomił dzięki Twojej logice! Jesteś w drodze! Szybkość Twoich obliczeń jest imponująca, Agencie! Czekam na Ciebie w bazie!"
     },
-        {
-      "date": "2025-12-12",
-      "introText": "Ultron generuje energię, używając skomplikowanych wzorów. Twoje zadania to wzór na częstotliwość, która to zakłóci. Rozwiąż je precyzyjnie. Pamiętaj, tu nie ma miejsca na błąd – inaczej wybuchnie mi generator kawy!",
-      "tasks": ["Jeden z robotów Fantastycznej Czwórki został zainfekowany przez wirus Ultrona. Reed Richards zaszyfrował numer tego robota w działaniu. Wpisz numer robota: VII+V-IV+10+VII+XII-3+I",
-      "Pojazd Fantastycznej Czwórki może poruszać się z prędkością 500 km/h, jeśli jest pusty. Każdy kilogram obciążenia spowalnia pojazd o 2km/h. Jak szybko będzie się poruszał, jeśli wsiądzie do niego The Thing, który waży 220 kg?",
-       "Wprowadź rozwiązanie: 100+2*5-67+90-17-90-2*5+67+17-1"],
-      "answers": ["XI", "60", "99"],
-      "rewardIndex": 1,
-      "successText": "Mamy to! Twoja częstotliwość zadziałała! Ultron na moment stracił zasilanie w całym sektorze! Gratulacje, Młody Agencie, to była prawdziwa sztuka!"
+    {
+      "date": "generic1",
+      "introText": "Agencie! Ultron atakuje ponownie! Musimy szybko obliczyć kody dostępu do jego sieci. Rozwiąż poniższe zadania matematyczne, a wstrzykniemy wirusa do systemu Ultrona!",
+      "tasks": [],
+      "answers": [],
+      "rewardIndex": 999,
+      "successText": "Świetna robota, Agencie! Kody zadziałały - część robotów Ultrona jest unieruchomiona! Twoje zdolności matematyczne są imponujące!"
+    },
+    {
+      "date": "generic2",
+      "introText": "Pilna wiadomość od SHIELD! Potrzebujemy Twoich zdolności obliczeniowych, by odblokować zasoby Avengersów. Każde poprawne rozwiązanie to krok bliżej do pokonania Ultrona!",
+      "tasks": [],
+      "answers": [],
+      "rewardIndex": 999,
+      "successText": "Doskonale! Zasoby SHIELD są odblokowane dzięki Twoim obliczeniom! Avengers mogą kontynuować walkę!"
+    },
+    {
+      "date": "generic3",
+      "introText": "Agencie, tu Spider Man. Potrzebuję Twojej pomocy z szyfrowaniem. Rozwiąż te zadania, a uzyskamy dostęp do tajnych planów Ultrona!",
+      "tasks": [],
+      "answers": [],
+      "rewardIndex": 999,
+      "successText": "Fantastycznie! Dzięki Tobie mamy dostęp do planów Ultrona. Jesteś prawdziwym bohaterem, Agencie!"
     }
   ]
 }

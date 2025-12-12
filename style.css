@@ -550,7 +550,30 @@ body {
 .date-box span {
     color: var(--accent);
     font-weight: 600;
+}/* Napis gratulacyjny */
+.congrats-text {
+    margin-top: 10px;
+    font-size: 1.4em;
+    color: #00ff00;
+    text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+    animation: pulse-glow 1.5s ease-in-out infinite;
 }
+
+@keyframes pulse-glow {
+    0%, 100% {
+        opacity: 1;
+        text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+    }
+    50% {
+        opacity: 0.8;
+        text-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00, 0 0 60px #00ff00;
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+
 /* Responsywność dla przycisków intro */
 @media (max-width: 480px) {
     .intro-buttons {

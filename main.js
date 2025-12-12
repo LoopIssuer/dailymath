@@ -14,6 +14,125 @@ let playerName = null;
 let voicesLoaded = false;
 let interferenceAudio = null;
 
+// NOWE: Przechowuje wygenerowane zadania dla generic
+let generatedTasks = null;
+
+// ===================== SEEDED RANDOM GENERATOR =====================
+// Deterministyczny generator - ten sam seed = te same "losowe" wartości
+function createSeededRandom(seed) {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    const char = seed.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  
+  return function() {
+    hash = (hash * 1103515245 + 12345) & 0x7fffffff;
+    return hash / 0x7fffffff;
+  };
+}
+
+// ===================== GENERATOR ZADAŃ MATEMATYCZNYCH =====================
+function generateMathTasks(seed) {
+  const rng = createSeededRandom(seed);
+  const tasks = [];
+  const answers = [];
+  
+  for (let i = 0; i < 3; i++) {
+    // Generuj wyrażenie z 3-5 liczbami
+    const numOperations = Math.floor(rng() * 3) + 3; // 3-5 liczb
+    
+    let expression = '';
+    let result = 0;
+    
+    for (let j = 0; j < numOperations; j++) {
+      // Liczby od 1 do 100
+      const num = Math.floor(rng() * 100) + 1;
+      
+      if (j === 0) {
+        expression = num.toString();
+        result = num;
+      } else {
+        // Losuj operator: + lub -
+        const isAdd = rng() > 0.5;
+        if (isAdd) {
+          expression += ` + ${num}`;
+          result += num;
+        } else {
+          expression += ` - ${num}`;
+          result -= num;
+        }
+      }
+    }
+    
+    tasks.push(`Oblicz: ${expression} = ?`);
+    answers.push(result.toString());
+  }
+  
+  return { tasks, answers };
+}
+
+// ===================== LOSOWANIE GENERIC PUZZLE =====================
+function selectGenericPuzzle(seed) {
+  const rng = createSeededRandom(seed);
+  
+  // Znajdź wszystkie puzzle zaczynające się od "generic"
+  const genericPuzzles = appConfig.puzzles.filter(p => 
+    p.date.startsWith("generic")
+  );
+  
+  if (genericPuzzles.length === 0) {
+    return null;
+  }
+  
+  // Deterministyczny wybór na podstawie seed
+  const index = Math.floor(rng() * genericPuzzles.length);
+  return genericPuzzles[index];
+}
+
+// ===================== ZNAJDOWANIE KOLEJNEJ NIEODBLOKOWANEJ LITERY =====================
+function getNextUnlockedIndex(finalSolution, unlockedIndexes) {
+  const unlocked = unlockedIndexes || [];
+  
+  for (let i = 0; i < finalSolution.length; i++) {
+    // Pomijaj spacje
+    if (finalSolution[i] === ' ') continue;
+    
+    // Jeśli ten indeks nie jest odblokowany, zwróć go
+    if (!unlocked.includes(i)) {
+      return i;
+    }
+  }
+  
+  // Wszystkie litery już odblokowane
+  return -1;
+}
+
+// ===================== SPRAWDZENIE CZY JUŻ ROZWIĄZANO DZIŚ =====================
+function hasAlreadySolvedToday() {
+  if (!playerRow || !playerRow.solved_days) {
+    return false;
+  }
+  return playerRow.solved_days.includes(gameDay);
+}
+
+// ===================== SPRAWDZENIE CZY WSZYSTKIE LITERY ODBLOKOWANE =====================
+function areAllLettersUnlocked() {
+  if (!appConfig || !appConfig.finalSolution) return false;
+  if (!playerRow || !playerRow.letter_indexes) return false;
+  
+  const final = appConfig.finalSolution;
+  const unlocked = playerRow.letter_indexes;
+  
+  for (let i = 0; i < final.length; i++) {
+    if (final[i] === ' ') continue;
+    if (!unlocked.includes(i)) return false;
+  }
+  
+  return true;
+}
+
 // ===================== INICJALIZACJA GŁOSÓW TTS =====================
 function initVoices() {
   return new Promise((resolve) => {
@@ -83,7 +202,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   // Wczytaj progres gracza
   playerRow = await loadPlayerByName(playerName);
 
-  // Wyrenderuj zadanie
+  // Wyrenderuj zadanie (lub komunikat że już rozwiązano)
   renderPuzzleUI();
   updateLettersLabel();
 
@@ -229,13 +348,56 @@ function setupWelcomeListener() {
   if (btn) {
     btn.addEventListener("click", () => {
       overlay.classList.add("hidden");
-      showIntroPanel();
+      
+      // Sprawdź czy już rozwiązano dziś
+      if (hasAlreadySolvedToday()) {
+        showAlreadySolvedPanel();
+      } else {
+        showIntroPanel();
+      }
     });
   }
 }
 
 function showWelcomePanel() {
   const overlay = document.getElementById("welcomeOverlay");
+  overlay.classList.remove("hidden");
+}
+
+// ===================== ALREADY SOLVED PANEL =====================
+function showAlreadySolvedPanel() {
+  const overlay = document.getElementById("introOverlay");
+  const img = document.getElementById("introImage");
+  const textEl = document.getElementById("introText");
+  const closeBtn = document.getElementById("introCloseButton");
+  const playBtn = document.getElementById("playAudioButton");
+
+  if (img) {
+    img.src = "img/already-solved.png"; // Opcjonalny obrazek
+    img.alt = "Już rozwiązano";
+    // Fallback jeśli obrazek nie istnieje
+    img.onerror = () => { img.style.display = 'none'; };
+  }
+
+  if (textEl) {
+    if (areAllLettersUnlocked()) {
+      textEl.innerText = `🎉 Gratulacje, Agencie ${playerName}! Odkryłeś całe hasło: "${appConfig.finalSolution}"! Misja zakończona sukcesem!`;
+    } else {
+      textEl.innerText = `Agencie ${playerName}, dzisiejsze zadanie zostało już rozwiązane! Wróć jutro po nowe wyzwanie. Ultron nie śpi, ale Ty zasłużyłeś na odpoczynek!`;
+    }
+  }
+
+  if (closeBtn) {
+    closeBtn.innerText = "Rozumiem";
+  }
+
+  if (playBtn) {
+    playBtn.classList.add("hidden"); // Ukryj przycisk audio
+  }
+
+  // Ukryj główne UI
+  hideMainUI();
+
   overlay.classList.remove("hidden");
 }
 
@@ -273,11 +435,11 @@ function showIntroPanel() {
     }
 
     if (textEl) {
-      textEl.innerText = "Skontaktuj się z agentem TW ;)";
+      textEl.innerText = "Witaj Agencie! Za chwilę podasz swoje imię.";
     }
 
     if (closeBtn) {
-      closeBtn.innerText = "Rozumiem";
+      closeBtn.innerText = "Jestem gotowy!";
     }
 
     if (playBtn) {
@@ -289,8 +451,16 @@ function showIntroPanel() {
     return;
   }
 
+  // Sprawdź czy to generic puzzle - użyj domyślnego obrazka
+  const isGeneric = currentPuzzle.date.startsWith("generic");
+  
   if (img) {
-    img.src = getImagePath(gameDay, "intro.png");
+    if (isGeneric) {
+      img.src = "img/generic-intro.png"; // Domyślny obrazek dla generic
+      img.onerror = () => { img.style.display = 'none'; }; // Ukryj jeśli nie istnieje
+    } else {
+      img.src = getImagePath(gameDay, "intro.png");
+    }
     img.alt = "Powitanie";
   }
 
@@ -449,10 +619,18 @@ function showResultPopup(isSuccess, rewardChar = null) {
   const rewardLabel = document.getElementById("rewardLetterLabel");
   const playBtn = document.getElementById("playResultAudioButton");
 
+  // Sprawdź czy to generic puzzle
+  const isGeneric = currentPuzzle && currentPuzzle.date.startsWith("generic");
+
   if (isSuccess) {
     // ========== SUKCES ==========
     if (img) {
-      img.src = getImagePath(gameDay, "success.png");
+      if (isGeneric) {
+        img.src = "img/generic-success.png"; // Domyślny obrazek sukcesu dla generic
+        img.onerror = () => { img.style.display = 'none'; };
+      } else {
+        img.src = getImagePath(gameDay, "success.png");
+      }
       img.alt = "Sukces";
     }
 
@@ -498,24 +676,62 @@ function showResultPopup(isSuccess, rewardChar = null) {
 
 // ===================== Render zadań =====================
 function renderPuzzleUI() {
-  currentPuzzle = appConfig.puzzles.find((p) => p.date === gameDay);
-
-  if (!currentPuzzle) {
+  // Najpierw sprawdź czy już rozwiązano dziś
+  if (hasAlreadySolvedToday()) {
     document.getElementById("taskText0").innerText = "";
     document.getElementById("taskText1").innerText = "";
     document.getElementById("taskText2").innerText = "";
     disableInputs();
-    hideMainUI();
+    // Nie ukrywamy UI tutaj - zrobimy to w showAlreadySolvedPanel
     return;
   }
 
+  // Szukaj puzzle dla aktualnej daty
+  currentPuzzle = appConfig.puzzles.find((p) => p.date === gameDay);
+
+  // Jeśli nie ma puzzle dla dzisiejszej daty - użyj generic
+  if (!currentPuzzle) {
+    console.log("Brak puzzle dla daty:", gameDay, "- używam generic");
+    
+    // Deterministyczne losowanie generic puzzle na podstawie daty
+    currentPuzzle = selectGenericPuzzle(gameDay);
+    
+    if (!currentPuzzle) {
+      console.error("Brak generic puzzli w konfiguracji!");
+      document.getElementById("taskText0").innerText = "";
+      document.getElementById("taskText1").innerText = "";
+      document.getElementById("taskText2").innerText = "";
+      disableInputs();
+      hideMainUI();
+      return;
+    }
+    
+    // Generuj losowe zadania matematyczne (deterministycznie na podstawie daty)
+    generatedTasks = generateMathTasks(gameDay);
+    
+    console.log("Wygenerowane zadania:", generatedTasks);
+    
+    // Nadpisz tasks i answers w currentPuzzle
+    currentPuzzle = {
+      ...currentPuzzle,
+      tasks: generatedTasks.tasks,
+      answers: generatedTasks.answers,
+      // rewardIndex będzie obliczony dynamicznie przy rozwiązaniu
+      isGeneric: true
+    };
+  }
+
+  // Renderuj zadania
   currentPuzzle.tasks.forEach((t, idx) => {
     const el = document.getElementById(`taskText${idx}`);
     if (el) el.innerText = t;
   });
 
-  for (let i = 0; i < 3; i++) {
-    tryLoadTaskImage(gameDay, i);
+  // Próbuj załadować obrazki (dla generic prawdopodobnie nie będzie)
+  if (!currentPuzzle.isGeneric) {
+    for (let i = 0; i < 3; i++) {
+      tryLoadTaskImage(gameDay, i);
+    }
   }
 }
 
@@ -531,9 +747,11 @@ function hideMainUI() {
 // ===================== Wyświetlanie liter / hasła =====================
 function updateLettersLabel() {
   const label = document.getElementById("lettersLabel");
+  const congratsLabel = document.getElementById("congratsLabel");
 
   if (!appConfig || !appConfig.finalSolution) {
     label.innerText = "";
+    if (congratsLabel) congratsLabel.classList.add("hidden");
     return;
   }
 
@@ -544,6 +762,7 @@ function updateLettersLabel() {
       : [];
 
   let pattern = "";
+  let allUnlocked = true;
 
   for (let i = 0; i < final.length; i++) {
     const ch = final[i];
@@ -557,12 +776,21 @@ function updateLettersLabel() {
       pattern += ch + " ";
     } else {
       pattern += "_ ";
+      allUnlocked = false;
     }
   }
 
   label.innerText = pattern.trim();
-}
 
+  // Pokaż/ukryj gratulacje
+  if (congratsLabel) {
+    if (allUnlocked) {
+      congratsLabel.classList.remove("hidden");
+    } else {
+      congratsLabel.classList.add("hidden");
+    }
+  }
+}
 // ===================== Blokada inputów =====================
 function disableInputs() {
   for (let i = 0; i < 3; i++) {
@@ -575,42 +803,63 @@ function disableInputs() {
 
 // ===================== Aktualizacja progresu w bazie =====================
 async function updatePlayerAfterSolve() {
-  const rewardIndex = currentPuzzle.rewardIndex;
+  // Sprawdź czy już rozwiązano dziś (dodatkowe zabezpieczenie)
+  if (hasAlreadySolvedToday()) {
+    console.log("Już rozwiązano dziś - pomijam aktualizację");
+    return null;
+  }
+
+  // Oblicz rewardIndex
+  let rewardIndex;
+  
+  if (currentPuzzle.isGeneric) {
+    // Dla generic: znajdź kolejną nieodblokowaną literę
+    const currentIndexes = playerRow?.letter_indexes || [];
+    rewardIndex = getNextUnlockedIndex(appConfig.finalSolution, currentIndexes);
+    
+    if (rewardIndex === -1) {
+      console.log("Wszystkie litery już odblokowane!");
+      // Mimo to zapisz że rozwiązano dziś
+      rewardIndex = null;
+    }
+  } else {
+    // Dla zwykłych puzzli: użyj zdefiniowanego rewardIndex
+    rewardIndex = currentPuzzle.rewardIndex;
+  }
 
   if (!playerRow) {
+    // Nowy gracz
+    const insertData = {
+      name: playerName,
+      letter_indexes: rewardIndex !== null ? [rewardIndex] : [],
+      solved_days: [gameDay],
+    };
+
     const { data, error } = await supabaseClient
       .from("players")
-      .insert([
-        {
-          name: playerName,
-          letter_indexes: [rewardIndex],
-          solved_days: [gameDay],
-        },
-      ])
+      .insert([insertData])
       .select()
       .single();
 
     if (error) {
       console.error("Błąd INSERT players:", error);
-      return;
+      return null;
     }
 
     playerRow = data;
-    return;
+    return rewardIndex;
   }
 
-  const alreadySolved = (playerRow.solved_days || []).includes(gameDay);
-  if (alreadySolved) {
-    return;
-  }
-
+  // Istniejący gracz - aktualizuj
   const currentIndexes = Array.isArray(playerRow.letter_indexes)
     ? playerRow.letter_indexes
     : [];
 
-  const newIndexes = currentIndexes.includes(rewardIndex)
-    ? currentIndexes
-    : [...currentIndexes, rewardIndex];
+  let newIndexes = currentIndexes;
+  
+  if (rewardIndex !== null && !currentIndexes.includes(rewardIndex)) {
+    newIndexes = [...currentIndexes, rewardIndex];
+  }
 
   const newSolved = [...(playerRow.solved_days || []), gameDay];
 
@@ -626,15 +875,22 @@ async function updatePlayerAfterSolve() {
 
   if (error) {
     console.error("Błąd UPDATE players:", error);
-    return;
+    return null;
   }
 
   playerRow = data;
+  return rewardIndex;
 }
 
 // ===================== Sprawdzanie odpowiedzi =====================
 async function onCheckClick() {
   if (!currentPuzzle) return;
+
+  // Dodatkowe sprawdzenie - czy już rozwiązano dziś
+  if (hasAlreadySolvedToday()) {
+    alert("Już rozwiązałeś dzisiejsze zadanie! Wróć jutro.");
+    return;
+  }
 
   const userAnswers = [
     document.getElementById("answer0").value.trim().toUpperCase(),
@@ -650,15 +906,22 @@ async function onCheckClick() {
     return;
   }
 
-  await updatePlayerAfterSolve();
+  // Rozwiązano poprawnie!
+  const rewardIndex = await updatePlayerAfterSolve();
   updateLettersLabel();
 
+  // Pobierz literę nagrody
   const final = appConfig.finalSolution;
-  const rewardIndex = currentPuzzle.rewardIndex;
-  const rewardChar =
-    typeof rewardIndex === "number" && rewardIndex >= 0 && rewardIndex < final.length
-      ? final[rewardIndex]
-      : "?";
+  let rewardChar = "?";
+  
+  if (rewardIndex !== null && rewardIndex >= 0 && rewardIndex < final.length) {
+    rewardChar = final[rewardIndex];
+  } else if (rewardIndex === null) {
+    rewardChar = "✓"; // Wszystkie litery już odblokowane
+  }
 
   showResultPopup(true, rewardChar);
+  
+  // Zablokuj ponowne rozwiązywanie
+  disableInputs();
 }
