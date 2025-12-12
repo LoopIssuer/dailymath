@@ -35,7 +35,7 @@ export function showAlreadySolvedPanel(playerName, appConfig, areAllLettersUnloc
 
   if (textEl) {
     if (areAllLettersUnlocked) {
-      textEl.innerText = `🎉 Gratulacje, Agencie ${playerName}! Odkryłeś całe hasło: "${appConfig.finalSolution}"! Misja zakończona sukcesem! n\Skontaktuj się z Agentem TW! `;
+      textEl.innerText = `🎉 Gratulacje, Agencie ${playerName}! Odkryłeś całe hasło: "${appConfig.finalSolution}"! Misja zakończona sukcesem! \nSkontaktuj się z Agentem TW! `;
     } else {
       textEl.innerText = `Agencie ${playerName}, dzisiejsze zadanie zostało już rozwiązane! Wróć jutro po nowe wyzwanie. Ultron nie śpi, ale Ty zasłużyłeś na odpoczynek!`;
     }
