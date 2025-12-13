@@ -19,7 +19,7 @@
         "W jednym wagonie mieści się 20 pasażerów. Na stacji jest 120 wagonów. Ewakuacja odbędzie się pojazdem Shield, który mieści 300 ludzi na raz. Ile razy pojazd Shield będzie musiał przylecieć na stację, by zabrać wszystkich?",
         "Wprowadź rozwiązanie: 45+45-12-12+22+98-17+96="
       ],
-      "answers": ["1120", "8", "265"],
+      "answers": ["1112", "8", "265"],
       "rewardIndex": 0,
       "successText": "Wiadomość z ostatniej chwili! Wstrzyknąłeś kod! Agencie, roboty na stacji są zdezaktywowane! Twoja precyzja w obliczeniach jest godna Stark Tower! Jutro odezwę się ponownie!"
     },
