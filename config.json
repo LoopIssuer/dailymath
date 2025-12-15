@@ -12,7 +12,7 @@
   "errorText": "Niestety, odpowiedzi są błędne. \nUltron nadal nie jest powstrzymany!\n Spróbuj ponownie!",
   "puzzles": [
     {
-      "date": "2025-12-14",
+      "date": "2025-12-15",
       "introText": "Agencie! Tu Tony Stark. Ultron ma kontrolę nad systemami na Głównej Stacji Kolejowej. Masz zestaw zadań! Rozwiąż je, a uzyskany kod wstrzyknie się do ich systemu i je zdezaktywuje. Nie zawiedź mnie!",
       "tasks": [
         "Stacja kolejowa jest atakowana przez 153 roboty Ultrona oraz samego Ultrona. Żeby pokonać jednego robota Iron Man musi użyć promienia laserowego o mocy 5 kilowatów. Do pokonania Ultrona potrzeba 347 KW. Ile mocy potrzebuje Iron Man by pokonać wszystkich?",
@@ -24,7 +24,7 @@
       "successText": "Wiadomość z ostatniej chwili! Wstrzyknąłeś kod! Agencie, roboty na stacji są zdezaktywowane! Twoja precyzja w obliczeniach jest godna Stark Tower! Jutro odezwę się ponownie!"
     },
     {
-      "date": "2025-12-15",
+      "date": "2025-12-17",
       "introText": "Doskonała robota wczoraj! Teraz musisz się pospieszyć. Wysyłam Ci kod. Rozwiązanie to klucz do uruchomienia starego pojazdu Fantastycznej Czwórki, który jest jedynym sposobem, byś dotarł do mojej tajnej siedziby. Szybkie obliczenia to Twoja przepustka na Manhattan!",
       "tasks": [
         "Jeden z robotów Fantastycznej Czwórki został zainfekowany przez wirus Ultrona. Reed Richards zaszyfrował numer tego robota w działaniu. Wpisz numer robota: VII+V-IV+10+VII+XII-3+I",
@@ -32,7 +32,7 @@
         "Wprowadź rozwiązanie: 100+2*5-67+90-17-90-2*5+67+17-1"
       ],
       "answers": ["XI", "60", "99"],
-      "rewardIndex": 1,
+      "rewardIndex": 2,
       "successText": "Niesamowite! Pojazd Fantastycznej Czwórki właśnie się uruchomił dzięki Twojej logice! Jesteś w drodze! Szybkość Twoich obliczeń jest imponująca, Agencie! Czekam na Ciebie w bazie!"
     },
     {
